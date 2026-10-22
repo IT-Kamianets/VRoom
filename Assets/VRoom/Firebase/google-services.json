@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "398914265119",
+    "project_id": "vroom-8ef42",
+    "storage_bucket": "vroom-8ef42.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:398914265119:android:f2ad4b4563712bcc18752a",
+        "android_client_info": {
+          "package_name": "com.itkamianets.vroom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "398914265119-78mhkijaso7mo4cs1m4p6iko16s0v139.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuRZG4k17oDtu5-POWWhYHenGQ4H8w5ac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "398914265119-78mhkijaso7mo4cs1m4p6iko16s0v139.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "398914265119-d30jm5vok9enejbogcf53an9t1blbnj9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itkamianets.vroom"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:398914265119:android:64a7b91fe01de65918752a",
+        "android_client_info": {
+          "package_name": "com.itkamianets.vroomscanner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "398914265119-78mhkijaso7mo4cs1m4p6iko16s0v139.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuRZG4k17oDtu5-POWWhYHenGQ4H8w5ac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "398914265119-78mhkijaso7mo4cs1m4p6iko16s0v139.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "398914265119-d30jm5vok9enejbogcf53an9t1blbnj9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itkamianets.vroom"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

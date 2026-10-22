@@ -1,0 +1,17 @@
+{
+    "name": "VRoom",
+    "rootNamespace": "VRoom",
+    "references": [
+        "ITKamianets.Engine.Core",
+        "ITKamianets.Engine.Firebase"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

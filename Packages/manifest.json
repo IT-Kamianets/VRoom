@@ -1,14 +1,32 @@
 {
   "dependencies": {
+    "com.itkamianets.3d-constructor-character-view-camera": "https://github.com/IT-Kamianets/3d-constructor-character-view-camera.git",
+    "com.itkamianets.3d-constructor-character-view-controls": "https://github.com/IT-Kamianets/3d-constructor-character-view-controls.git",
+    "com.itkamianets.3d-constructor-vr-controls": "https://github.com/IT-Kamianets/3d-constructor-vr-controls.git",
+    "com.itkamianets.3d-unity-assets": "https://github.com/IT-Kamianets/3d-unity-assets.git",
+    "com.itkamianets.3d-unity-audio": "https://github.com/IT-Kamianets/3d-unity-audio.git",
+    "com.itkamianets.3d-unity-character": "https://github.com/IT-Kamianets/3d-unity-character.git",
+    "com.itkamianets.3d-unity-core": "https://github.com/IT-Kamianets/3d-unity-core.git",
+    "com.itkamianets.3d-unity-firebase": "https://github.com/IT-Kamianets/3d-unity-firebase.git",
+    "com.itkamianets.3d-unity-input": "https://github.com/IT-Kamianets/3d-unity-input.git",
+    "com.itkamianets.3d-unity-interaction": "https://github.com/IT-Kamianets/3d-unity-interaction.git",
+    "com.itkamianets.3d-unity-scene": "https://github.com/IT-Kamianets/3d-unity-scene.git",
+    "com.itkamianets.3d-unity-spatial": "https://github.com/IT-Kamianets/3d-unity-spatial.git",
+    "com.itkamianets.3d-unity-xr": "https://github.com/IT-Kamianets/3d-unity-xr.git",
+    "com.meta.xr.mrutilitykit": "207.0.1",
     "com.unity.ai.navigation": "2.0.15",
+    "com.unity.cloud.gltfast": "6.20.0",
     "com.unity.ide.rider": "3.0.38",
     "com.unity.ide.visualstudio": "2.0.26",
     "com.unity.inputsystem": "1.20.0",
+    "com.unity.pipeline": "0.9.0-exp.1",
     "com.unity.render-pipelines.universal": "17.6.0",
     "com.unity.test-framework": "1.8.0",
     "com.unity.timeline": "6.6.0",
     "com.unity.ugui": "2.6.0",
     "com.unity.visualscripting": "1.9.12",
+    "com.unity.xr.meta-openxr": "2.6.1",
+    "com.unity.xr.openxr": "1.18.0",
     "com.unity.modules.accessibility": "1.0.0",
     "com.unity.modules.adaptiveperformance": "1.0.0",
     "com.unity.modules.ai": "1.0.0",
@@ -45,5 +63,14 @@
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
-  }
+  },
+  "scopedRegistries": [
+    {
+      "name": "Meta XR",
+      "url": "https://npm.developer.oculus.com",
+      "scopes": [
+        "com.meta.xr"
+      ]
+    }
+  ]
 }

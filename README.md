@@ -1,40 +1,23 @@
-# Лендинг VRoom
+# Character View starter
 
-Автономна українська лендинг-сторінка на основі наданого макета. HTML, CSS, вбудований SVG та JavaScript; без етапу збірки та зовнішніх залежностей.
+Start a **Character View** game on the [IT Kamianets 3D Engine](https://3d.itkamianets.com): 1st + 3rd person, games like GTA V, Cyberpunk 2077, Elden Ring.
 
-## Дипломний проєкт
+The camera and controls for this style are ready.
 
-- [Презентація](https://vroom.itkamianets.com/presentation/) — файл [`presentation/index.html`](presentation/index.html)
-- [Опис дипломних робіт (Крістіна та Аліна)](DIPLOMA.md)
+## Start
 
-## Бізнес-логіка продукту
+1. Clone this repository under your game's name.
+2. Open it in Unity Hub with Unity 6000.6: it is an empty Universal 3D project.
+3. Follow [AGENTS.md](AGENTS.md): add the engine packages, build the game. Hand it to your AI agent, or follow it yourself.
 
-VRoom — це інструмент для створення інтер'єрів квартир за допомогою AI, 3D-редактора та VR (Meta Quest 3). Нижче описано логіку продукту так, як вона представлена на лендингу.
+Engine packages for this style: `3d-unity-core`, `3d-unity-scene`, `3d-unity-input`, `3d-unity-character`, `3d-unity-assets`, `3d-unity-audio`, `3d-constructor-character-view-camera`, `3d-constructor-character-view-controls`.
 
-### Основна ідея
+Every package, with what it does and how to install it: https://3d.itkamianets.com/packages.md
 
-1. **AI-генерація.** Користувач створює план квартири (вручну або через імпорт), вказує розміри, двері, вікна, призначення кімнат і бажаний стиль. AI аналізує ці дані та бібліотеку доступних 3D-моделей меблів, після чого автоматично розставляє меблі й формує готовий варіант інтер'єру.
-2. **3D-редагування.** Кожен об'єкт у згенерованій сцені залишається повністю редагованим: переміщення, обертання, масштабування, дублювання, видалення, Undo/Redo, прив'язка (snap) до стін, підлоги та поверхонь. Можна також змінювати матеріали й кольори, підбирати меблі з каталогу, керувати об'єктами через Scene Tree та панель властивостей.
-3. **VR-режим.** Той самий проєкт відкривається в Meta Quest 3 — користувач фізично «заходить» у квартиру, ходить нею, бере меблі руками, переміщує й замінює їх, працює з AI-командами прямо у VR.
-4. **AI-асистент.** Через чат користувач формулює команди природною мовою («зроби більше вільного простору», «заміни диван на менший», «зроби кімнату теплішою», «покажи три інші варіанти», «використовуй дешевші меблі») — AI відповідно коригує сцену.
+## Changing an engine package
 
-### Наскрізний процес (єдиний проєкт на всіх пристроях)
+The `3d-*` packages are shared by every game. To change one, clone it into `Packages/` (Unity uses that copy instead of the git URL; git ignores it), work on a branch or your fork, and open a pull request to its `master` branch. [AGENTS.md](AGENTS.md) has the steps.
 
-AI Builder → 3D-сцена → Desktop/Quest Editor → Client Viewer → Список меблів.
+## AI agents
 
-Один проєкт квартири синхронізований між ПК та Meta Quest 3: точну роботу з деталями зручно робити на ПК (миша/клавіатура), а відчуття масштабу й просторове редагування — у VR.
-
-### Бібліотека 3D-моделей та зв'язок з реальними товарами
-
-AI працює лише з доступними 3D-моделями. Кожна модель має структуровані характеристики: назва, категорія, розміри, матеріали й кольори, стиль, виробник, ціна, посилання на товар. Після завершення дизайну система може сформувати список використаних меблів із цінами та посиланнями на покупку — тобто 3D-сцена перетворюється на конкретний список товарів для замовлення.
-
-### Цільові сегменти використання
-
-- **Дизайнери інтер'єру** — швидке створення концептів за допомогою AI, подальше ручне редагування, презентація клієнту у VR.
-- **Меблеві компанії** — завантаження власного каталогу товарів, щоб AI розставляв саме їхні меблі в майбутній квартирі клієнта; шлях від каталогу до замовлення.
-- **Забудовники** — демонстрація ще не збудованої квартири у вигляді цифрового двійника, який покупець може оглянути у VR, з варіантами стилів (Modern, Minimal, Classic, Premium).
-- **Клієнт (View Only режим)** — обмежений доступ без редактора: перегляд кімнат, меблів, інформації про товари та перемикання варіантів дизайну на ПК, у VR, у браузері (мобільний доступ — у планах).
-
-### Roadmap (заплановані можливості)
-
-Мета — максимально автоматизувати створення 3D-інтер'єру: аналіз PDF-планів квартир, креслень, фотографій планування, сканів приміщень та LiDAR/spatial scanning з автоматичним перетворенням їх на готову 3D-квартиру (PDF floor plan → 3D-стіни → Меблі → VR).
+[AGENTS.md](AGENTS.md) is the guide for any AI agent (Codex, Cursor, Copilot and others read it automatically); [CLAUDE.md](CLAUDE.md) points Claude Code to it.

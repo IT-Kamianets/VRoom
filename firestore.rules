@@ -2,6 +2,12 @@ rules_version = '2';
 
 // Data layout of 3d-unity-firebase: profiles and progress belong to their player,
 // scenes are readable by any signed-in player and writable by their owner.
+//
+// WARNING: the Firebase project vroom-8ef42 is shared with other apps (the `interiors` rules of VRoom's
+// first version, and Assetra), and the console keeps ONE published rule set for the whole project.
+// Never publish this file as it is: that would delete their rules. Merge the blocks below into the
+// published set (Firebase console -> Firestore Database -> Rules) and keep everything that is already there.
+// The game needs at least the `users/{uid}/progress/{key}` block (the project list is saved there).
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{uid} {

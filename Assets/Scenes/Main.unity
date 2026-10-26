@@ -2548,6 +2548,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1358205778}
   - component: {fileID: 1358205779}
+  - component: {fileID: 1358205781}
+  - component: {fileID: 1358205780}
   m_Layer: 0
   m_Name: Book
   m_TagString: Untagged
@@ -2589,6 +2591,46 @@ MonoBehaviour:
   googleButton: {fileID: 838775331}
   buttonLabel: {fileID: 548040881}
   statusLabel: {fileID: 840695056}
+  loginPages:
+  - {fileID: 821731913}
+  - {fileID: 430248834}
+  pageFlip: {fileID: 1358205781}
+  projectPages: {fileID: 1358205780}
+  turnDelay: 0.9
+--- !u!114 &1358205780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1358205777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8eefa8a68cdf9a94ba6e2719694096c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: VRoom::VRoom.ProjectsPages
+  font: {fileID: 11400000, guid: bcb6691c331c1bd4f8d88b5beba1223e, type: 2}
+  viewCamera: {fileID: 330585545}
+  pageCenterX: 0.2
+  canvasHeight: 0.0405
+--- !u!114 &1358205781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1358205777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d540c10dbe0e15e43bb9a7337484e579, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: VRoom::VRoom.PageFlip
+  paper: {fileID: 2100000, guid: 4c61f630b25c25f4993ad6a01a451d31, type: 2}
+  bookModel: {fileID: 1911250443}
+  pageWidth: 0.364
+  pageHeight: 0.38
+  duration: 1.25
+  segments: 28
 --- !u!1 &1438977177
 GameObject:
   m_ObjectHideFlags: 0
@@ -3286,6 +3328,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1826537972}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!33 &1911250443 stripped
+MeshFilter:
+  m_CorrespondingSourceObject: {fileID: -5754084199372789682, guid: 5efcc2a90e1b1424e919dd1201b3607f, type: 3}
+  m_PrefabInstance: {fileID: 1799248313}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1915812429
 GameObject:
   m_ObjectHideFlags: 0

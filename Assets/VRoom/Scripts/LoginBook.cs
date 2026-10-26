@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,8 +13,8 @@ namespace VRoom
     {
         [SerializeField] private FirebaseBootstrap bootstrap;
         [SerializeField] private Button googleButton;
-        [SerializeField] private Text buttonLabel;
-        [SerializeField] private Text statusLabel;
+        [SerializeField] private TMP_Text buttonLabel;
+        [SerializeField] private TMP_Text statusLabel;
 
         private void Awake()
         {

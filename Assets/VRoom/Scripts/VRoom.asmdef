@@ -4,6 +4,7 @@
     "references": [
         "ITKamianets.Engine.Core",
         "UnityEngine.UI",
+        "Unity.TextMeshPro",
         "ITKamianets.Engine.Firebase"
     ],
     "includePlatforms": [],

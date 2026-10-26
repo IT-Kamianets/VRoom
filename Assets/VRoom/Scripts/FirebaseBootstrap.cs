@@ -7,7 +7,7 @@ using UnityEngine;
 namespace VRoom
 {
     /// <summary>
-    /// Connects VRoom to its Firebase project (vroom-8ef42) on start and signs the player in with email.
+    /// Connects VRoom to its Firebase project (vroom-8ef42) on start and signs the player in with email or Google.
     /// The account saved on this device is reused; without one, a simple login window asks for email and password.
     /// Put it on one object in the first scene and assign Assets/VRoom/Firebase/google-services.json.
     /// </summary>
@@ -16,6 +16,23 @@ namespace VRoom
         private const string LogCategory = "VRoom.Firebase";
 
         [SerializeField] private TextAsset googleServicesJson;
+
+        [Header("Google sign-in (PC)")]
+        [Tooltip("JSON of a 'Desktop app' OAuth client from Google Cloud (project of vroom-8ef42): Assets/VRoom/Firebase/google-oauth-client.json. Git ignores it because it holds the client secret; ask a teammate for the file or download it from Google Cloud › Credentials.")]
+        [SerializeField] private TextAsset googleOAuthClientJson;
+
+        [Serializable]
+        private class OAuthClientFile
+        {
+            public OAuthClient installed;
+        }
+
+        [Serializable]
+        private class OAuthClient
+        {
+            public string client_id;
+            public string client_secret;
+        }
 
         private EngineFirebase _firebase;
         private bool _showLogin;
@@ -34,6 +51,7 @@ namespace VRoom
             try
             {
                 _firebase = EngineFirebase.Initialize(FirebaseConfig.FromGoogleServicesJson(googleServicesJson.text));
+                _firebase.Auth.SignedIn += _ => _showLogin = false;
                 if (await _firebase.Auth.TrySignInAgainAsync())
                 {
                     Connected();
@@ -88,7 +106,7 @@ namespace VRoom
                 return;
             }
 
-            GUILayout.BeginArea(new Rect(Screen.width / 2f - 160, Screen.height / 2f - 110, 320, 220), GUI.skin.box);
+            GUILayout.BeginArea(new Rect(Screen.width / 2f - 160, Screen.height / 2f - 140, 320, 280), GUI.skin.box);
             GUILayout.Label("VRoom: вхід");
             GUILayout.Label("Пошта");
             _email = GUILayout.TextField(_email);
@@ -108,6 +126,21 @@ namespace VRoom
             }
 
             GUILayout.EndHorizontal();
+
+            if (GUILayout.Button("Увійти через Google"))
+            {
+                var client = googleOAuthClientJson != null ? JsonUtility.FromJson<OAuthClientFile>(googleOAuthClientJson.text)?.installed : null;
+                if (client == null || string.IsNullOrEmpty(client.client_id) || string.IsNullOrEmpty(client.client_secret))
+                {
+                    _status = "Немає файлу Google OAuth (google-oauth-client.json).";
+                }
+                else
+                {
+                    Run(() => _firebase.Auth.SignInWithGoogleAsync(client.client_id, client.client_secret), "");
+                    _status = "Завершіть вхід у браузері…";
+                }
+            }
+
             if (GUILayout.Button("Забули пароль?"))
             {
                 Run(() => _firebase.Auth.SendPasswordResetAsync(_email.Trim()), "Лист для скидання пароля надіслано.");

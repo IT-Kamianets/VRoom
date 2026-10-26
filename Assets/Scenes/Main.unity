@@ -462,6 +462,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: VRoom::VRoom.FirebaseBootstrap
   googleServicesJson: {fileID: 4900000, guid: 579a576ef6666fb45bf3a0cbb14d7817, type: 3}
+  googleOAuthClientJson: {fileID: 4900000, guid: ce048431202a0b74c85e8b2c35fe91a9, type: 3}
 --- !u!4 &1622730286
 Transform:
   m_ObjectHideFlags: 0

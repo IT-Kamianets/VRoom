@@ -118,3 +118,7 @@ desktop.ini
 /Packages/*
 !/Packages/manifest.json
 !/Packages/packages-lock.json
+
+# Google OAuth client (Desktop app) with its secret: each developer keeps their own copy
+/Assets/VRoom/Firebase/google-oauth-client.json
+/Assets/VRoom/Firebase/google-oauth-client.json.meta

@@ -5,7 +5,7 @@ flat (spine along Y, pages left and right, top is +Z), with leather cover, curve
 and a ribbon bookmark. It writes Assets/VRoom/Models/LoginBook.fbx and the textures to Assets/VRoom/Textures/,
 then removes the temporary objects from the open file.
 
-Page size: 0.28 x 0.38 m; the flat reading area of each page is about 0.24 x 0.34 m, centred at x = +-0.16.
+Page size: 0.364 x 0.38 m; the flat reading area of each page is about 0.30 x 0.34 m, centred at x = +-0.20.
 """
 import math
 import os
@@ -20,8 +20,8 @@ TEXTURE_DIR = os.path.join(PROJECT, "Assets", "VRoom", "Textures")
 os.makedirs(MODEL_DIR, exist_ok=True)
 os.makedirs(TEXTURE_DIR, exist_ok=True)
 
-COVER_W, COVER_H, COVER_T = 0.60, 0.40, 0.006
-PAGE_X0, PAGE_X1, PAGE_H = 0.0, 0.284, 0.38
+COVER_W, COVER_H, COVER_T = 0.76, 0.40, 0.006
+PAGE_X0, PAGE_X1, PAGE_H = 0.0, 0.364, 0.38
 STACK = 0.030
 rng = np.random.default_rng(7)
 
@@ -176,7 +176,7 @@ def top_height(ax):
     """Height of the page stack top at distance ax from the spine: a gutter dip, a gentle droop at the outer edge."""
     z = COVER_T + STACK
     z -= 0.011 * math.exp(-(ax / 0.022) ** 2)
-    z -= 0.002 * smoothstep(0.25, PAGE_X1, ax)
+    z -= 0.002 * smoothstep(PAGE_X1 - 0.035, PAGE_X1, ax)
     return z
 
 
@@ -185,11 +185,11 @@ def top_z(x, y):
     ax = abs(x)
     z = top_height(ax)
     z += 0.0007 * math.sin(x * 37 + y * 23) + 0.0005 * math.sin(x * 91 - y * 57 + 1.3) + 0.0004 * math.sin(y * 71 + x * 13)
-    z -= 0.0035 * smoothstep(0.23, PAGE_X1, ax) * smoothstep(0.13, PAGE_H / 2, abs(y))
+    z -= 0.0035 * smoothstep(PAGE_X1 - 0.055, PAGE_X1, ax) * smoothstep(0.13, PAGE_H / 2, abs(y))
     return z
 
 
-def page_block(bm, side, nx=40, ny=12):
+def page_block(bm, side, nx=52, ny=12):
     top, bot = {}, {}
     y0 = -PAGE_H / 2
     for i in range(nx + 1):

@@ -19,7 +19,7 @@ namespace VRoom
         [SerializeField] private float pageCenterX = 0.20f;
         [SerializeField] private float canvasHeight = 0.0405f;
 
-        private static readonly Color Ink = new Color(0.17f, 0.10f, 0.06f);
+        private static readonly Color Ink = new Color(0.02f, 0.02f, 0.02f);
         private static readonly Color Cream = new Color(0.98f, 0.94f, 0.84f);
         private static readonly Color Leather = new Color(0.45f, 0.07f, 0.10f);
 
@@ -148,7 +148,7 @@ namespace VRoom
             areaRect.offsetMin = new Vector2(12f, 4f);
             areaRect.offsetMax = new Vector2(-12f, -4f);
 
-            var placeholder = Label("Placeholder", area.transform, "Назва проєкту", 22f, FontStyles.Italic, new Color(0.17f, 0.10f, 0.06f, 0.5f), Vector2.zero, Vector2.zero, TextAlignmentOptions.Left);
+            var placeholder = Label("Placeholder", area.transform, "Назва проєкту", 22f, FontStyles.Italic, new Color(0.02f, 0.02f, 0.02f, 0.5f), Vector2.zero, Vector2.zero, TextAlignmentOptions.Left);
             var text = Label("Text", area.transform, "", 24f, FontStyles.Normal, Ink, Vector2.zero, Vector2.zero, TextAlignmentOptions.Left);
             foreach (var t in new[] { placeholder, text })
             {

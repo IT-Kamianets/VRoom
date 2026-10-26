@@ -78,15 +78,16 @@
       "dependencies": {}
     },
     "com.itkamianets.3d-unity-firebase": {
-      "version": "file:3d-unity-firebase",
+      "version": "https://github.com/IT-Kamianets/3d-unity-firebase.git",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.itkamianets.3d-unity-core": "0.1.0",
         "com.itkamianets.3d-unity-scene": "0.1.0",
         "com.unity.nuget.newtonsoft-json": "3.2.2",
         "com.unity.modules.unitywebrequest": "1.0.0"
-      }
+      },
+      "hash": "6181c068d654cbb83c794bdca5d762784ad0254e"
     },
     "com.itkamianets.3d-unity-input": {
       "version": "file:3d-unity-input",

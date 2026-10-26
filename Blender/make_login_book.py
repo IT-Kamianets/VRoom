@@ -21,7 +21,7 @@ os.makedirs(MODEL_DIR, exist_ok=True)
 os.makedirs(TEXTURE_DIR, exist_ok=True)
 
 COVER_W, COVER_H, COVER_T = 0.60, 0.40, 0.006
-PAGE_X0, PAGE_X1, PAGE_H = 0.002, 0.284, 0.38
+PAGE_X0, PAGE_X1, PAGE_H = 0.0, 0.284, 0.38
 STACK = 0.030
 rng = np.random.default_rng(7)
 
@@ -135,21 +135,35 @@ def paper_texture(h=1024, w=2048):
     dark = np.clip(dark * (0.75 + 0.5 * stain_n), 0, 0.8)
     albedo = albedo * (1 - dark[..., None] * np.array([0.8, 0.9, 1.0])[None, None, :])
     save_png("LoginBook_Paper_Albedo", albedo)
+    detail = fine * 0.5 + fiber * 0.8
+    gy, gx = np.gradient(detail)
+    nx, ny, nz = -gx * 9.0, -gy * 9.0, np.ones_like(detail)
+    length = np.sqrt(nx ** 2 + ny ** 2 + nz ** 2)
+    save_png("LoginBook_Paper_Normal", np.stack([nx / length, ny / length, nz / length], axis=-1) * 0.5 + 0.5)
 
 
-def page_edge_texture(w=64, h=1024):
-    """Browned, grubby sheet edges."""
-    v = np.zeros(h)
+def page_edge_texture(w=256, h=1024):
+    """Edge of the page stack: about 90 fine sheets, each a little different, with dark gaps between them."""
+    tone = np.zeros(h)
+    height = np.zeros(h)
     i = 0
     while i < h:
-        step = int(rng.integers(3, 6))
-        v[i:i + step] = 0.70 + 0.16 * rng.random()
-        v[i:i + 1] = 0.40 + 0.12 * rng.random()  # the thin shadow between two sheets
+        step = int(rng.integers(8, 14))
+        sheet = 0.84 + 0.14 * rng.random()
+        tone[i:i + step] = sheet
+        ramp = np.linspace(0.0, 1.0, min(step, h - i))
+        height[i:i + len(ramp)] = ramp ** 0.6 * (0.7 + 0.5 * rng.random())
+        tone[i:i + 2] = 0.50 + 0.14 * rng.random()  # thin shadow between two sheets
         i += step
-    grime = norm01(blur(rng.standard_normal((h, w)), 5.0))
-    shade = np.repeat(v[:, None], w, axis=1) * (0.75 + 0.35 * grime)
-    albedo = np.stack([shade * 0.88, shade * 0.70, shade * 0.46], axis=-1)
+    grime = norm01(blur(rng.standard_normal((h, w)), 6.0))
+    streak = norm01(blur(rng.standard_normal((h, w)), 0.8)) - 0.5
+    shade = np.repeat(tone[:, None], w, axis=1) * (0.88 + 0.22 * grime) + streak * 0.05
+    albedo = np.stack([shade * 1.0, shade * 0.90, shade * 0.70], axis=-1)
     save_png("LoginBook_PageEdge_Albedo", albedo)
+    dh = np.gradient(np.repeat(height[:, None], w, axis=1), axis=0)
+    nx, ny, nz = np.zeros_like(dh), -dh * 1.6, np.ones_like(dh)
+    length = np.sqrt(nx ** 2 + ny ** 2 + nz ** 2)
+    save_png("LoginBook_PageEdge_Normal", np.stack([nx / length, ny / length, nz / length], axis=-1) * 0.5 + 0.5)
 
 
 # ---------------------------------------------------------------- geometry
@@ -198,7 +212,6 @@ def page_block(bm, side, nx=40, ny=12):
         quad(top[i, 0], bot[i, 0], bot[i + 1, 0], top[i + 1, 0], 2)  # bottom edge (front)
         quad(top[i, ny], top[i + 1, ny], bot[i + 1, ny], bot[i, ny], 2)  # top edge (back)
     for j in range(ny):
-        quad(top[0, j], top[0, j + 1], bot[0, j + 1], bot[0, j], 2)  # spine side
         quad(top[nx, j], bot[nx, j], bot[nx, j + 1], top[nx, j + 1], 2)  # outer edge
 
 
@@ -247,7 +260,8 @@ def assign_uvs(bm):
                 loop[uv].uv = ((x + PAGE_X1) / (2 * PAGE_X1), (y + PAGE_H / 2) / PAGE_H)
             elif m == 2:  # page edge: stripes follow the height
                 s = (y if abs(n.x) > abs(n.y) else x)
-                loop[uv].uv = (s * 8.0, (z - COVER_T) / STACK)
+                local = max(top_z(x, y) - COVER_T, 1e-4)
+                loop[uv].uv = (s * 6.0, (z - COVER_T) / local)
             elif m == 3:  # ribbon
                 loop[uv].uv = (x * 40.0, y)
             else:  # leather
@@ -268,6 +282,7 @@ bm = bmesh.new()
 cover(bm)
 page_block(bm, +1)
 page_block(bm, -1)
+bmesh.ops.remove_doubles(bm, verts=bm.verts[:], dist=1e-5)  # the two page blocks become one surface across the spine
 ribbon(bm)
 bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
 assign_uvs(bm)

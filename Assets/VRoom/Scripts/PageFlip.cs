@@ -28,6 +28,7 @@ namespace VRoom
         private Vector3[] _vertices;
         private Vector2[] _uvs;
         private float _time;
+        private float _length;
         private bool _playing;
         private Action _done;
         private bool _uAtPositiveXIsHigh;
@@ -43,7 +44,7 @@ namespace VRoom
         }
 
         /// <summary>Turns the page. Calls <paramref name="done"/> when it has settled on the left side.</summary>
-        public void Play(Action done = null)
+        public void Play(Action done = null, float seconds = 0f)
         {
             if (_playing)
             {
@@ -51,6 +52,7 @@ namespace VRoom
             }
 
             _done = done;
+            _length = seconds > 0f ? seconds : duration;
             _time = 0f;
             _playing = true;
             Evaluate(0f);
@@ -71,7 +73,7 @@ namespace VRoom
             }
 
             _time += Time.deltaTime;
-            var t = Mathf.Clamp01(_time / duration);
+            var t = Mathf.Clamp01(_time / _length);
             Evaluate(t);
             if (t >= 1f)
             {

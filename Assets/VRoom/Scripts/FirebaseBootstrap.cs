@@ -34,12 +34,46 @@ namespace VRoom
             public string client_secret;
         }
 
+        [Header("Login")]
+        [Tooltip("Show the temporary email login window (IMGUI, PC screen only). The book in the room (LoginBook) offers Google sign-in.")]
+        [SerializeField] private bool showEmailWindow;
+
         private EngineFirebase _firebase;
         private bool _showLogin;
         private bool _busy;
         private string _email = "";
         private string _password = "";
         private string _status = "";
+
+        /// <summary>True while the player has to sign in (no saved account).</summary>
+        public bool LoginRequired => _showLogin;
+
+        /// <summary>True while a sign-in is in progress (for example waiting for the browser).</summary>
+        public bool Busy => _busy;
+
+        /// <summary>Last sign-in message to show the player, empty when there is none.</summary>
+        public string Status => _status;
+
+        public bool IsSignedIn => _firebase != null && _firebase.Auth.IsSignedIn;
+
+        /// <summary>Opens the browser for Google sign-in (PC).</summary>
+        public void SignInWithGoogle()
+        {
+            if (_busy || _firebase == null)
+            {
+                return;
+            }
+
+            var client = googleOAuthClientJson != null ? JsonUtility.FromJson<OAuthClientFile>(googleOAuthClientJson.text)?.installed : null;
+            if (client == null || string.IsNullOrEmpty(client.client_id) || string.IsNullOrEmpty(client.client_secret))
+            {
+                _status = "Немає файлу Google OAuth (google-oauth-client.json).";
+                return;
+            }
+
+            Run(() => _firebase.Auth.SignInWithGoogleAsync(client.client_id, client.client_secret), "");
+            _status = "Завершіть вхід у браузері…";
+        }
 
         private async void Start()
         {
@@ -101,7 +135,7 @@ namespace VRoom
         // A temporary login window until VRoom has its own menus; it shows on the PC screen, not in the headset.
         private void OnGUI()
         {
-            if (!_showLogin)
+            if (!_showLogin || !showEmailWindow)
             {
                 return;
             }
@@ -129,16 +163,7 @@ namespace VRoom
 
             if (GUILayout.Button("Увійти через Google"))
             {
-                var client = googleOAuthClientJson != null ? JsonUtility.FromJson<OAuthClientFile>(googleOAuthClientJson.text)?.installed : null;
-                if (client == null || string.IsNullOrEmpty(client.client_id) || string.IsNullOrEmpty(client.client_secret))
-                {
-                    _status = "Немає файлу Google OAuth (google-oauth-client.json).";
-                }
-                else
-                {
-                    Run(() => _firebase.Auth.SignInWithGoogleAsync(client.client_id, client.client_secret), "");
-                    _status = "Завершіть вхід у браузері…";
-                }
+                SignInWithGoogle();
             }
 
             if (GUILayout.Button("Забули пароль?"))

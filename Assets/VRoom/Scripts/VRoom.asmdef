@@ -3,6 +3,7 @@
     "rootNamespace": "VRoom",
     "references": [
         "ITKamianets.Engine.Core",
+        "UnityEngine.UI",
         "ITKamianets.Engine.Firebase"
     ],
     "includePlatforms": [],

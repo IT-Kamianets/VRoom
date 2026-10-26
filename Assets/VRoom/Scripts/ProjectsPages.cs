@@ -125,7 +125,8 @@ namespace VRoom
             _listRoot = root.GetComponent<RectTransform>();
             _listRoot.anchoredPosition = Vector2.zero;
             _listRoot.sizeDelta = new Vector2(280f, 260f);
-            _emptyLabel = Label("Empty", _leftCanvas, "Тут з'являться твої проєкти.\nСтвори перший на сторінці праворуч.", 20f, FontStyles.Italic, Ink, new Vector2(0f, 20f), new Vector2(270f, 90f));
+            _emptyLabel = Label("Empty", _leftCanvas, "Тут з'являться твої проєкти.\nСтвори перший на сторінці праворуч.", 20f, FontStyles.Bold, Color.black, new Vector2(0f, 20f), new Vector2(280f, 130f));
+            _emptyLabel.overflowMode = TextOverflowModes.Overflow;
         }
 
         private void BuildRight()
@@ -138,7 +139,7 @@ namespace VRoom
             rect.anchoredPosition = new Vector2(0f, 62f);
             rect.sizeDelta = new Vector2(260f, 52f);
             var image = go.GetComponent<Image>();
-            image.color = new Color(1f, 0.97f, 0.9f, 0.9f);
+            image.color = new Color(1f, 0.98f, 0.93f, 1f);
 
             var area = new GameObject("Text Area", typeof(RectTransform), typeof(RectMask2D));
             area.transform.SetParent(go.transform, false);
@@ -148,8 +149,8 @@ namespace VRoom
             areaRect.offsetMin = new Vector2(12f, 4f);
             areaRect.offsetMax = new Vector2(-12f, -4f);
 
-            var placeholder = Label("Placeholder", area.transform, "Назва проєкту", 22f, FontStyles.Italic, new Color(0.02f, 0.02f, 0.02f, 0.5f), Vector2.zero, Vector2.zero, TextAlignmentOptions.Left);
-            var text = Label("Text", area.transform, "", 24f, FontStyles.Normal, Ink, Vector2.zero, Vector2.zero, TextAlignmentOptions.Left);
+            var placeholder = Label("Placeholder", area.transform, "Назва проєкту", 22f, FontStyles.Italic, new Color(0.02f, 0.02f, 0.02f, 0.6f), Vector2.zero, Vector2.zero, TextAlignmentOptions.Left);
+            var text = Label("Text", area.transform, "", 26f, FontStyles.Bold, Color.black, Vector2.zero, Vector2.zero, TextAlignmentOptions.Left);
             foreach (var t in new[] { placeholder, text })
             {
                 var r = t.rectTransform;
@@ -166,16 +167,16 @@ namespace VRoom
             _nameInput.textComponent = text;
             _nameInput.placeholder = placeholder;
             _nameInput.fontAsset = font;
-            _nameInput.pointSize = 24f;
+            _nameInput.pointSize = 26f;
             _nameInput.characterLimit = 40;
             _nameInput.lineType = TMP_InputField.LineType.SingleLine;
-            _nameInput.caretColor = Ink;
+            _nameInput.caretColor = Color.black;
             _nameInput.selectionColor = new Color(0.45f, 0.07f, 0.10f, 0.35f);
             _nameInput.onSubmit.AddListener(_ => Create());
 
             _createButton = MakeButton("Create Button", _rightCanvas, "Створити", 26f, Leather, Cream, new Vector2(0f, -8f), new Vector2(200f, 56f));
             _createButton.onClick.AddListener(Create);
-            _status = Label("Status", _rightCanvas, "", 19f, FontStyles.Italic, Ink, new Vector2(0f, -88f), new Vector2(270f, 100f));
+            _status = Label("Status", _rightCanvas, "", 21f, FontStyles.Bold, Color.black, new Vector2(0f, -88f), new Vector2(270f, 100f));
         }
 
         private void Refresh()
@@ -197,7 +198,7 @@ namespace VRoom
 
             if (items.Count > shown)
             {
-                Label("More", _listRoot, $"і ще {items.Count - shown}…", 18f, FontStyles.Italic, Ink, new Vector2(0f, 85f - shown * 48f), new Vector2(270f, 30f));
+                Label("More", _listRoot, $"і ще {items.Count - shown}…", 20f, FontStyles.Bold, Color.black, new Vector2(0f, 85f - shown * 48f), new Vector2(270f, 30f));
             }
         }
 

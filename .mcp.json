@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "unity-editor-mcp": {
+      "type": "stdio",
+      "command": "C:\\Users\\Kristina\\AppData\\Local\\Unity\\bin\\unity.exe",
+      "args": ["mcp", "--project-path", "D:\\work\\VRoom"]
+    }
+  }
+}

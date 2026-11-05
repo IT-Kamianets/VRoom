@@ -1,0 +1,17 @@
+name: Fastlane app build
+
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    fastlane:
+        # The Mac runner belongs to WebArtWork, so ask WebArtWork/fastlane to build this app.
+        # Needs the FASTLANE_DISPATCH_TOKEN secret (org or repository secret)
+        runs-on: ubuntu-latest
+        steps:
+            - name: Trigger fastlane build
+              env:
+                  GH_TOKEN: ${{ secrets.FASTLANE_DISPATCH_TOKEN }}
+              run: gh api --method POST repos/WebArtWork/fastlane/actions/workflows/build-app.yml/dispatches -f ref=master -f "inputs[app_name]=vroom"

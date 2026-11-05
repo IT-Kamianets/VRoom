@@ -1,4 +1,4 @@
-<p align="center"><img src="branding/logo.png" alt="VRoom — Design · Visualize · Create" width="480"></p>
+<p align="center"><img src="branding/logo.png" alt="VRoom" width="240"></p>
 
 # Character View starter
 

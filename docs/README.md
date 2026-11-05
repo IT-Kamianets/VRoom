@@ -1,4 +1,4 @@
-<p align="center"><img src="logo.png" alt="VRoom" width="420"></p>
+<p align="center"><img src="logo.png" alt="VRoom" width="240"></p>
 
 # Лендинг VRoom
 

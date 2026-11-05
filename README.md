@@ -1,3 +1,5 @@
+<p align="center"><img src="branding/logo.png" alt="VRoom — Design · Visualize · Create" width="480"></p>
+
 # Character View starter
 
 Start a **Character View** game on the [IT Kamianets 3D Engine](https://3d.itkamianets.com): 1st + 3rd person, games like GTA V, Cyberpunk 2077, Elden Ring.

@@ -111,6 +111,30 @@
           "z": 0.4492
         }
       }
+    },
+    {
+      "id": "props/modern-bed",
+      "name": "Modern double bed",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.95,
+          "y": -0.38,
+          "z": -0.92
+        },
+        "max": {
+          "x": 0.95,
+          "y": 0.38,
+          "z": 0.92
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/modern-bed.glb",
+        "format": "glb"
+      }
     }
   ]
 }

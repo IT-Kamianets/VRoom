@@ -135,6 +135,30 @@
         "uri": "Assets/Models/props/modern-bed.glb",
         "format": "glb"
       }
+    },
+    {
+      "id": "props/bedside-table",
+      "name": "Bedside table",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.275,
+          "y": -0.247,
+          "z": -0.19
+        },
+        "max": {
+          "x": 0.275,
+          "y": 0.247,
+          "z": 0.19
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/bedside-table.glb",
+        "format": "glb"
+      }
     }
   ]
 }

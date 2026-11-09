@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "1.0.0",
+  "libraryId": "vroom",
+  "units": "meters",
+  "metadata": {
+    "tags": [
+      "assetra"
+    ],
+    "properties": {
+      "assetra": {
+        "format": 1,
+        "project": "vroom",
+        "name": "VRoom",
+        "modelsDir": "Assets/Models"
+      }
+    }
+  },
+  "assets": [
+    {
+      "id": "props/book-stand",
+      "name": "Book stand",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "source": {
+        "uri": "Assets/Models/props/book-stand.glb",
+        "format": "glb"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.42,
+          "y": 0,
+          "z": -0.24809
+        },
+        "max": {
+          "x": 0.42,
+          "y": 0.20548,
+          "z": 0.23817
+        }
+      }
+    },
+    {
+      "id": "props/candlestick",
+      "name": "Candlestick",
+      "kind": "model",
+      "placeholder": {
+        "shape": "capsule"
+      },
+      "source": {
+        "uri": "Assets/Models/props/candlestick.glb",
+        "format": "glb"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.076,
+          "y": 0,
+          "z": -0.076
+        },
+        "max": {
+          "x": 0.076,
+          "y": 0.5895,
+          "z": 0.076
+        }
+      }
+    },
+    {
+      "id": "props/login-book",
+      "name": "Login book",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "source": {
+        "uri": "Assets/Models/props/login-book.glb",
+        "format": "glb"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.38,
+          "y": -0.1193,
+          "z": -0.2
+        },
+        "max": {
+          "x": 0.38,
+          "y": 0.03757,
+          "z": 0.34
+        }
+      }
+    },
+    {
+      "id": "props/old-table",
+      "name": "Old table",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "source": {
+        "uri": "Assets/Models/props/old-table.glb",
+        "format": "glb"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.8,
+          "y": 0,
+          "z": -0.4492
+        },
+        "max": {
+          "x": 0.8,
+          "y": 0.78108,
+          "z": 0.4492
+        }
+      }
+    }
+  ]
+}

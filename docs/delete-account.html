@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VRoom — Видалення акаунта та даних</title>
+<link rel="icon" href="favicon.png">
+<style>
+body{margin:0;background:#0b0b18;color:#e9e6f5;font-family:Arial,sans-serif;line-height:1.65}
+main{max-width:780px;margin:auto;padding:40px 22px 70px}
+h1{font-size:32px;margin:0 0 6px}h2{font-size:20px;margin:30px 0 8px;color:#c5b0ff}
+p,li{font-size:15px;color:#cfc9e2}a{color:#9ab4ff}.muted{color:#9891ac;font-size:13px}
+hr{border:0;border-top:1px solid #ffffff20;margin:44px 0}
+</style>
+</head>
+<body>
+<main>
+<p><a href="./">← VRoom</a> · <a href="privacy.html">Політика конфіденційності</a></p>
+<h1>Видалення акаунта та даних VRoom</h1>
+<p class="muted">Застосунок: VRoom (com.itkamianets.vroom) · Розробник: IT Kamianets</p>
+
+<h2>Як запросити видалення акаунта</h2>
+<ol>
+<li>Відкрийте сторінку <a href="https://github.com/IT-Kamianets/VRoom/issues/new">github.com/IT-Kamianets/VRoom/issues/new</a>.</li>
+<li>У заголовку напишіть: «VRoom: видалення акаунта».</li>
+<li>У тексті вкажіть адресу електронної пошти Google-акаунта, яким ви входите у VRoom. Інші конфіденційні дані (паролі, документи) не вказуйте.</li>
+<li>Ми підтвердимо запит і видалимо ваш акаунт та дані протягом 30 днів.</li>
+</ol>
+
+<h2>Які дані буде видалено</h2>
+<ul>
+<li>обліковий запис (електронна пошта, унікальний ідентифікатор користувача) у Firebase Authentication;</li>
+<li>усі ваші проєкти: назви, ідентифікатори, дати створення та вміст проєктів у Cloud Firestore;</li>
+<li>профільні дані, пов’язані з вашим акаунтом.</li>
+</ul>
+
+<h2>Які дані можуть зберігатися</h2>
+<p>Технічні журнали сервісів Google Firebase (наприклад, журнали збоїв без прямої прив’язки до особи) можуть зберігатися до 90 днів відповідно до політик Google. Резервні копії видаляються протягом 30 днів після видалення основних даних. Інших даних про вас ми не зберігаємо.</p>
+
+<h2>Видалення окремих проєктів</h2>
+<p>Окремий проєкт можна видалити, не видаляючи акаунт. Для цього скористайтеся списком проєктів у застосунку або вкажіть у запиті, які проєкти потрібно видалити.</p>
+
+<hr>
+<h1 lang="en">Delete your VRoom account and data</h1>
+<div lang="en">
+<p>App: VRoom (com.itkamianets.vroom) · Developer: IT Kamianets</p>
+<h2>How to request deletion</h2>
+<ol>
+<li>Open <a href="https://github.com/IT-Kamianets/VRoom/issues/new">github.com/IT-Kamianets/VRoom/issues/new</a>.</li>
+<li>Use the title "VRoom: account deletion".</li>
+<li>Include the email of the Google account you use to sign in to VRoom. Do not post passwords or other confidential details.</li>
+<li>We will confirm and delete your account and data within 30 days.</li>
+</ol>
+<h2>What is deleted</h2>
+<p>Your account (email, user ID) in Firebase Authentication, all your projects (names, IDs, dates and project content) in Cloud Firestore, and profile data linked to your account.</p>
+<h2>What may be retained</h2>
+<p>Technical Firebase logs (e.g. crash logs) may be kept up to 90 days under Google's policies; backups are purged within 30 days after the primary data is deleted.</p>
+<h2>Deleting individual projects</h2>
+<p>You can delete a single project without deleting your account, using the project list in the app or by naming the projects in your request.</p>
+</div>
+</main>
+</body>
+</html>

@@ -4,6 +4,11 @@
       "type": "stdio",
       "command": "C:\\Users\\Kristina\\AppData\\Local\\Unity\\bin\\unity.exe",
       "args": ["mcp", "--project-path", "D:\\work\\VRoom"]
+    },
+    "blender": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["--python", "C:\\Users\\II\\AppData\\Roaming\\uv\\python\\cpython-3.12.15-windows-x86_64-none\\python.exe", "blender-mcp"]
     }
   }
 }

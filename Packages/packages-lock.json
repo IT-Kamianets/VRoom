@@ -1,43 +1,46 @@
 {
   "dependencies": {
     "com.itkamianets.3d-constructor-character-view-camera": {
-      "version": "file:3d-constructor-character-view-camera",
+      "version": "https://github.com/IT-Kamianets/3d-constructor-character-view-camera.git",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.itkamianets.3d-unity-core": "0.1.0",
         "com.itkamianets.3d-unity-input": "0.1.0",
         "com.itkamianets.3d-unity-character": "0.1.0",
         "com.unity.modules.physics": "1.0.0"
-      }
+      },
+      "hash": "dbbd9e72e5aefb01b53019c91c7cfe1f2ee3facb"
     },
     "com.itkamianets.3d-constructor-character-view-controls": {
-      "version": "file:3d-constructor-character-view-controls",
+      "version": "https://github.com/IT-Kamianets/3d-constructor-character-view-controls.git",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.itkamianets.3d-unity-core": "0.1.0",
         "com.itkamianets.3d-unity-input": "0.1.0",
         "com.itkamianets.3d-unity-character": "0.1.0",
         "com.itkamianets.3d-constructor-character-view-camera": "0.1.0"
-      }
+      },
+      "hash": "51ca9abf707f796748c684b83336e1be9bcb4d8d"
     },
     "com.itkamianets.3d-constructor-vr-controls": {
-      "version": "file:3d-constructor-vr-controls",
+      "version": "https://github.com/IT-Kamianets/3d-constructor-vr-controls.git",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.itkamianets.3d-unity-core": "0.1.0",
         "com.itkamianets.3d-unity-input": "0.1.0",
         "com.itkamianets.3d-unity-character": "0.1.0",
         "com.itkamianets.3d-unity-xr": "0.1.0",
         "com.unity.inputsystem": "1.20.0"
-      }
+      },
+      "hash": "6c8c113d90025a5c7ce31ff3bf0625c51e1542a9"
     },
     "com.itkamianets.3d-unity-assets": {
-      "version": "file:3d-unity-assets",
+      "version": "https://github.com/IT-Kamianets/3d-unity-assets.git",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.itkamianets.3d-unity-core": "0.1.0",
         "com.itkamianets.3d-unity-scene": "0.1.0",
@@ -47,35 +50,39 @@
         "com.unity.modules.unitywebrequestaudio": "1.0.0",
         "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.imageconversion": "1.0.0"
-      }
+      },
+      "hash": "bfd1d60bf25252a4e24c1378e19d89c1909e0091"
     },
     "com.itkamianets.3d-unity-audio": {
-      "version": "file:3d-unity-audio",
+      "version": "https://github.com/IT-Kamianets/3d-unity-audio.git",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.itkamianets.3d-unity-core": "0.1.0",
         "com.itkamianets.3d-unity-scene": "0.1.0",
         "com.itkamianets.3d-unity-assets": "0.1.0",
         "com.itkamianets.3d-unity-character": "0.1.0",
         "com.unity.modules.audio": "1.0.0"
-      }
+      },
+      "hash": "9863267c3fbb3de0a323478debdca015f6a8f32c"
     },
     "com.itkamianets.3d-unity-character": {
-      "version": "file:3d-unity-character",
+      "version": "https://github.com/IT-Kamianets/3d-unity-character.git",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.itkamianets.3d-unity-core": "0.1.0",
         "com.unity.modules.physics": "1.0.0",
         "com.unity.modules.animation": "1.0.0"
-      }
+      },
+      "hash": "f4ce7f4ce79b6e1642deb1cbb0df3f9586d00b80"
     },
     "com.itkamianets.3d-unity-core": {
-      "version": "file:3d-unity-core",
+      "version": "https://github.com/IT-Kamianets/3d-unity-core.git",
       "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
+      "source": "git",
+      "dependencies": {},
+      "hash": "d4d8f944759ae32d7ee2a3111aa1904c3f53a06a"
     },
     "com.itkamianets.3d-unity-firebase": {
       "version": "https://github.com/IT-Kamianets/3d-unity-firebase.git",
@@ -90,50 +97,54 @@
       "hash": "6181c068d654cbb83c794bdca5d762784ad0254e"
     },
     "com.itkamianets.3d-unity-input": {
-      "version": "file:3d-unity-input",
+      "version": "https://github.com/IT-Kamianets/3d-unity-input.git",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.itkamianets.3d-unity-core": "0.1.0",
         "com.unity.inputsystem": "1.20.0",
         "com.unity.ugui": "2.6.0",
         "com.unity.modules.xr": "1.0.0"
-      }
+      },
+      "hash": "b380862568245c3389881c9af0105b0fc6207734"
     },
     "com.itkamianets.3d-unity-interaction": {
-      "version": "file:3d-unity-interaction",
+      "version": "https://github.com/IT-Kamianets/3d-unity-interaction.git",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.itkamianets.3d-unity-core": "0.1.0",
         "com.itkamianets.3d-unity-scene": "0.1.0",
         "com.itkamianets.3d-unity-input": "0.1.0",
         "com.unity.modules.physics": "1.0.0"
-      }
+      },
+      "hash": "7ea30b03f17b021da1d2e6c54478d147fb51aa14"
     },
     "com.itkamianets.3d-unity-scene": {
-      "version": "file:3d-unity-scene",
+      "version": "https://github.com/IT-Kamianets/3d-unity-scene.git",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.itkamianets.3d-unity-core": "0.1.0",
         "com.unity.nuget.newtonsoft-json": "3.2.2",
         "com.unity.modules.physics": "1.0.0"
-      }
+      },
+      "hash": "e805fa6189e5313be26e0390bc07849f05dd709e"
     },
     "com.itkamianets.3d-unity-spatial": {
-      "version": "file:3d-unity-spatial",
+      "version": "https://github.com/IT-Kamianets/3d-unity-spatial.git",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.itkamianets.3d-unity-core": "0.1.0",
         "com.itkamianets.3d-unity-scene": "0.1.0"
-      }
+      },
+      "hash": "b0a22daed0832bca86c1e0bf67ffb1a9074acd39"
     },
     "com.itkamianets.3d-unity-xr": {
-      "version": "file:3d-unity-xr",
+      "version": "https://github.com/IT-Kamianets/3d-unity-xr.git",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.itkamianets.3d-unity-character": "0.1.0",
         "com.itkamianets.3d-unity-core": "0.1.0",
@@ -141,7 +152,8 @@
         "com.unity.inputsystem": "1.20.0",
         "com.unity.modules.xr": "1.0.0",
         "com.unity.ugui": "2.6.0"
-      }
+      },
+      "hash": "f4c835f1197f5c13fafcdf5d39d6d2d4b1901517"
     },
     "com.meta.xr.mrutilitykit": {
       "version": "207.0.1",
@@ -171,7 +183,7 @@
       "url": "https://npm.developer.oculus.com"
     },
     "com.unity.ai.navigation": {
-      "version": "2.0.15",
+      "version": "2.0.16",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -228,12 +240,10 @@
       "dependencies": {}
     },
     "com.unity.ide.rider": {
-      "version": "3.0.38",
+      "version": "3.1.0",
       "depth": 0,
       "source": "registry",
-      "dependencies": {
-        "com.unity.ext.nunit": "1.0.6"
-      },
+      "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
@@ -246,7 +256,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.inputsystem": {
-      "version": "1.20.0",
+      "version": "1.20.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -392,7 +402,7 @@
       }
     },
     "com.unity.visualscripting": {
-      "version": "1.9.12",
+      "version": "1.9.13",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -420,7 +430,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.compositionlayers": {
-      "version": "2.6.0",
+      "version": "2.6.1",
       "depth": 1,
       "source": "registry",
       "dependencies": {

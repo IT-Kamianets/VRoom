@@ -159,6 +159,438 @@
         "uri": "Assets/Models/props/bedside-table.glb",
         "format": "glb"
       }
+    },
+    {
+      "id": "props/armchair-beige",
+      "name": "Beige armchair",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.3782,
+          "y": 0,
+          "z": -0.3852
+        },
+        "max": {
+          "x": 0.3782,
+          "y": 0.85,
+          "z": 0.3852
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/armchair-beige.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/sofa-beige",
+      "name": "Beige sofa",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -1.05,
+          "y": 0,
+          "z": -0.4229
+        },
+        "max": {
+          "x": 1.05,
+          "y": 0.8327,
+          "z": 0.4229
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/sofa-beige.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/dining-table-oak",
+      "name": "Oak dining table",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -1.1465,
+          "y": 0,
+          "z": -0.5127
+        },
+        "max": {
+          "x": 1.1465,
+          "y": 0.75,
+          "z": 0.5127
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/dining-table-oak.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/dining-chair-linen",
+      "name": "Linen dining chair",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.2885,
+          "y": 0,
+          "z": -0.3366
+        },
+        "max": {
+          "x": 0.2885,
+          "y": 0.88,
+          "z": 0.3366
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/dining-chair-linen.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/kitchen-base-cabinet",
+      "name": "Kitchen base cabinet",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.4855,
+          "y": 0,
+          "z": -0.3593
+        },
+        "max": {
+          "x": 0.4855,
+          "y": 0.9,
+          "z": 0.3593
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/kitchen-base-cabinet.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/shower-cabin",
+      "name": "Glass shower cabin",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.5047,
+          "y": 0,
+          "z": -0.4184
+        },
+        "max": {
+          "x": 0.5047,
+          "y": 2,
+          "z": 0.4184
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/shower-cabin.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/kitchen-stove",
+      "name": "Kitchen stove with oven",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.4612,
+          "y": 0,
+          "z": -0.3534
+        },
+        "max": {
+          "x": 0.4612,
+          "y": 0.9,
+          "z": 0.3534
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/kitchen-stove.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/media-console-oak",
+      "name": "Oak media console",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.9,
+          "y": 0,
+          "z": -0.2555
+        },
+        "max": {
+          "x": 0.9,
+          "y": 0.4797,
+          "z": 0.2555
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/media-console-oak.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/nightstand-oak",
+      "name": "Oak nightstand",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.2724,
+          "y": 0,
+          "z": -0.2204
+        },
+        "max": {
+          "x": 0.2724,
+          "y": 0.55,
+          "z": 0.2204
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/nightstand-oak.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/wardrobe-oak",
+      "name": "Oak wardrobe",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.5668,
+          "y": 0,
+          "z": -0.3463
+        },
+        "max": {
+          "x": 0.5668,
+          "y": 2,
+          "z": 0.3463
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/wardrobe-oak.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/coffee-table-oval",
+      "name": "Oval coffee table",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.6,
+          "y": 0,
+          "z": -0.4268
+        },
+        "max": {
+          "x": 0.6,
+          "y": 0.4277,
+          "z": 0.4268
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/coffee-table-oval.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/toilet-wall-hung",
+      "name": "Wall-hung toilet",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.5772,
+          "y": 0,
+          "z": -0.5387
+        },
+        "max": {
+          "x": 0.5772,
+          "y": 1.15,
+          "z": 0.5387
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/toilet-wall-hung.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/fridge-built-in",
+      "name": "Built-in fridge",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.3758,
+          "y": 0,
+          "z": -0.383
+        },
+        "max": {
+          "x": 0.3758,
+          "y": 2,
+          "z": 0.383
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/fridge-built-in.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/fridge-side-by-side",
+      "name": "Side-by-side fridge",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.5741,
+          "y": 0,
+          "z": -0.4388
+        },
+        "max": {
+          "x": 0.5741,
+          "y": 2.1,
+          "z": 0.4388
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/fridge-side-by-side.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/bathroom-vanity-oak",
+      "name": "Oak bathroom vanity",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.4,
+          "y": 0,
+          "z": -0.2824
+        },
+        "max": {
+          "x": 0.4,
+          "y": 1.1169,
+          "z": 0.2824
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/bathroom-vanity-oak.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/double-bed-beige",
+      "name": "Beige double bed",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -1.0373,
+          "y": 0,
+          "z": -1.075
+        },
+        "max": {
+          "x": 1.0373,
+          "y": 1.249,
+          "z": 1.075
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/double-bed-beige.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/kitchen-wall-cabinet",
+      "name": "Kitchen wall cabinet",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.4,
+          "y": 0,
+          "z": -0.239
+        },
+        "max": {
+          "x": 0.4,
+          "y": 0.4608,
+          "z": 0.239
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/kitchen-wall-cabinet.glb",
+        "format": "glb"
+      }
+    },
+    {
+      "id": "props/kitchen-sink-cabinet",
+      "name": "Kitchen sink cabinet",
+      "kind": "model",
+      "placeholder": {
+        "shape": "box"
+      },
+      "bounds": {
+        "min": {
+          "x": -0.3,
+          "y": 0,
+          "z": -0.2464
+        },
+        "max": {
+          "x": 0.3,
+          "y": 0.9899,
+          "z": 0.2464
+        }
+      },
+      "source": {
+        "uri": "Assets/Models/props/kitchen-sink-cabinet.glb",
+        "format": "glb"
+      }
     }
   ]
 }

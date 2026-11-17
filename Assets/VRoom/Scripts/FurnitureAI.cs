@@ -25,9 +25,17 @@ namespace VRoom
         [SerializeField] float wallGap = 0.05f;
 
         // The model does not calculate metres for "next to X": it names the relation and the target, the code finds the spot.
-        const string SystemPrompt =
+        // Both the prompt and the schema are built from the Catalog, so a new model only needs one line there.
+        static string SystemPrompt =>
             "You control a VR room 10x10 meters. Seen from above: +x is RIGHT, -x is LEFT (the window is on the left wall, x=-5), " +
             "+z is UP (far wall), -z is DOWN (near the viewer). Coordinates are from -5 to 5. Reply ONLY with JSON following the schema. " +
+            "Items (id = what the user may call it): sofa_beige = sofa/диван, double_bed_beige = bed/ліжко, modern_double_bed = modern bed, " +
+            "armchair_beige = armchair/крісло, dining_table_oak = table/стіл, coffee_table_oval = coffee table/журнальний столик, " +
+            "old_table = old table, dining_chair_linen = chair/стілець, wardrobe_oak = wardrobe/шафа, fridge_side_by_side = fridge/холодильник, " +
+            "fridge_built_in = built-in fridge, nightstand_oak = nightstand/тумбочка, bedside_table = small bedside table, " +
+            "media_console_oak = TV stand/тумба під телевізор, kitchen_stove = stove/плита, kitchen_sink_cabinet = sink/мийка, " +
+            "kitchen_base_cabinet = kitchen cabinet, kitchen_wall_cabinet = wall cabinet/навісна шафа, bathroom_vanity_oak = bathroom vanity, " +
+            "shower_cabin = shower/душ, toilet_wall_hung = toilet/унітаз. " +
             "action: add = put a NEW item; move = move an EXISTING item; rotate = turn an EXISTING item by rotate_degrees " +
             "(positive = clockwise seen from above); remove = delete an EXISTING item. " +
             "For rotate and remove use position center, relation none, target none, x 0, z 0. " +
@@ -35,22 +43,37 @@ namespace VRoom
             "set relation (next_to, right_of, left_of, behind, in_front_of) and target (that other item, from the room state) and set x and z to 0; " +
             "the program computes the exact spot. Otherwise set relation none, target none and give x and z " +
             "('closer to the center' means x 0, z 0; 'a bit to the right' means the item's current x plus 1). " +
+            "If the command says 'under / by / near / against a wall', position MUST be a wall and NOT center: " +
+            "west_wall = the left wall with the window, east_wall = the right wall, north_wall = the far wall (up), " +
+            "south_wall = the near wall (down); if no wall is named use wall. Use center only when the command says the middle of the room. " +
+            "If the command says 'in a corner', position MUST be corner (not a wall) and x,z MUST be that corner: left far = (-4.5, 4.5), " +
+            "right far = (4.5, 4.5), left near = (-4.5, -4.5), right near = (4.5, -4.5); if no corner is named use (-4.5, 4.5). " +
             "Use the room state. Never use add to change an item that already exists. No explanations.\n" +
-            "Example. Room: sofa at (-4.0, 0.0) rotated 0 deg. Command: put a fridge to the right of the sofa. " +
-            "Answer: {\"action\":\"add\",\"item\":\"fridge\",\"position\":\"center\",\"relation\":\"right_of\",\"target\":\"sofa\",\"x\":0,\"z\":0,\"rotate_degrees\":0}\n" +
-            "Example. Room: table at (1.0, 1.0) rotated 0 deg. Command: move the table a bit to the left. " +
-            "Answer: {\"action\":\"move\",\"item\":\"table\",\"position\":\"center\",\"relation\":\"none\",\"target\":\"none\",\"x\":0.0,\"z\":1.0,\"rotate_degrees\":0}";
+            "Example. Room: sofa_beige at (-4.0, 0.0) rotated 0 deg. Command: put a fridge to the right of the sofa. " +
+            "Answer: {\"action\":\"add\",\"item\":\"fridge_side_by_side\",\"position\":\"center\",\"relation\":\"right_of\",\"target\":\"sofa_beige\",\"x\":0,\"z\":0,\"rotate_degrees\":0}\n" +
+            "Example. Room: dining_table_oak at (1.0, 1.0) rotated 0 deg. Command: move the table a bit to the left. " +
+            "Answer: {\"action\":\"move\",\"item\":\"dining_table_oak\",\"position\":\"center\",\"relation\":\"none\",\"target\":\"none\",\"x\":0.0,\"z\":1.0,\"rotate_degrees\":0}\n" +
+            "Example. Room: empty. Command: put a fridge in the right near corner. " +
+            "Answer: {\"action\":\"add\",\"item\":\"fridge_side_by_side\",\"position\":\"corner\",\"relation\":\"none\",\"target\":\"none\",\"x\":4.5,\"z\":-4.5,\"rotate_degrees\":0}\n" +
+            "Example. Room: empty. Command: put a wardrobe against the right wall. " +
+            "Answer: {\"action\":\"add\",\"item\":\"wardrobe_oak\",\"position\":\"east_wall\",\"relation\":\"none\",\"target\":\"none\",\"x\":0,\"z\":0,\"rotate_degrees\":0}";
 
         // Ollama forces the answer to follow this JSON schema, so item, action and relation are always valid words.
-        const string Schema =
-            @"{""type"":""object"",""properties"":{" +
-            @"""action"":{""type"":""string"",""enum"":[""add"",""move"",""rotate"",""remove""]}," +
-            @"""item"":{""type"":""string"",""enum"":[""sofa"",""bed"",""table"",""chair"",""wardrobe"",""fridge"",""nightstand""]}," +
-            @"""position"":{""type"":""string"",""enum"":[""near_window"",""center"",""corner"",""wall""]}," +
-            @"""relation"":{""type"":""string"",""enum"":[""none"",""next_to"",""right_of"",""left_of"",""behind"",""in_front_of""]}," +
-            @"""target"":{""type"":""string"",""enum"":[""none"",""sofa"",""bed"",""table"",""chair"",""wardrobe"",""fridge"",""nightstand""]}," +
-            @"""x"":{""type"":""number""},""z"":{""type"":""number""},""rotate_degrees"":{""type"":""number""}}," +
-            @"""required"":[""action"",""item"",""position"",""relation"",""target"",""x"",""z"",""rotate_degrees""]}";
+        static string Schema
+        {
+            get
+            {
+                var items = "\"" + string.Join("\",\"", Catalog.Keys) + "\"";
+                return @"{""type"":""object"",""properties"":{" +
+                    @"""action"":{""type"":""string"",""enum"":[""add"",""move"",""rotate"",""remove""]}," +
+                    @"""item"":{""type"":""string"",""enum"":[" + items + "]}," +
+                    @"""position"":{""type"":""string"",""enum"":[""near_window"",""center"",""corner"",""wall"",""west_wall"",""east_wall"",""north_wall"",""south_wall""]}," +
+                    @"""relation"":{""type"":""string"",""enum"":[""none"",""next_to"",""right_of"",""left_of"",""behind"",""in_front_of""]}," +
+                    @"""target"":{""type"":""string"",""enum"":[""none""," + items + "]}," +
+                    @"""x"":{""type"":""number""},""z"":{""type"":""number""},""rotate_degrees"":{""type"":""number""}}," +
+                    @"""required"":[""action"",""item"",""position"",""relation"",""target"",""x"",""z"",""rotate_degrees""]}";
+            }
+        }
 
         [Serializable] public class ChatMsg { public string role; public string content; }
         [Serializable] public class Opts { public int num_ctx = 2048; public float temperature = 0.2f; }
@@ -96,19 +119,34 @@ namespace VRoom
         struct Entry
         {
             public string file;
-            public float size; // the Meshy models are all normalised to ~1.9 m, so the real largest size is set here
-            public Entry(string file, float size) { this.file = file; this.size = size; }
+            public float lift; // metres above the floor, for things that hang on a wall
+            public Entry(string file, float lift = 0f) { this.file = file; this.lift = lift; }
         }
 
+        // The models from the Assetra collection "VRoom" are already in real metres, so they are not scaled.
         static readonly Dictionary<string, Entry> Catalog = new Dictionary<string, Entry>
         {
-            { "sofa", new Entry("sofa", 2.0f) },
-            { "bed", new Entry("bed", 2.1f) },
-            { "table", new Entry("table", 1.6f) },
-            { "chair", new Entry("chair", 1.0f) },
-            { "wardrobe", new Entry("wardrobe", 2.1f) },
-            { "fridge", new Entry("fridge", 1.8f) },
-            { "nightstand", new Entry("nightstand", 0.6f) },
+            { "sofa_beige", new Entry("sofa_beige") },
+            { "double_bed_beige", new Entry("double_bed_beige") },
+            { "modern_double_bed", new Entry("modern_double_bed") },
+            { "armchair_beige", new Entry("armchair_beige") },
+            { "dining_table_oak", new Entry("dining_table_oak") },
+            { "coffee_table_oval", new Entry("coffee_table_oval") },
+            { "old_table", new Entry("old_table") },
+            { "dining_chair_linen", new Entry("dining_chair_linen") },
+            { "wardrobe_oak", new Entry("wardrobe_oak") },
+            { "fridge_side_by_side", new Entry("fridge_side_by_side") },
+            { "fridge_built_in", new Entry("fridge_built_in") },
+            { "nightstand_oak", new Entry("nightstand_oak") },
+            { "bedside_table", new Entry("bedside_table") },
+            { "media_console_oak", new Entry("media_console_oak") },
+            { "kitchen_stove", new Entry("kitchen_stove") },
+            { "kitchen_sink_cabinet", new Entry("kitchen_sink_cabinet") },
+            { "kitchen_base_cabinet", new Entry("kitchen_base_cabinet") },
+            { "kitchen_wall_cabinet", new Entry("kitchen_wall_cabinet", 1.4f) },
+            { "bathroom_vanity_oak", new Entry("bathroom_vanity_oak") },
+            { "shower_cabin", new Entry("shower_cabin") },
+            { "toilet_wall_hung", new Entry("toilet_wall_hung") },
         };
 
         Transform furnitureRoot;
@@ -472,6 +510,10 @@ namespace VRoom
             if (r == null || string.IsNullOrEmpty(r.item) || !Catalog.TryGetValue(r.item, out var entry))
                 return "Модель повернула невідомий предмет: " + (r == null ? "null" : r.item);
 
+            // The model named the other item but forgot the relation: "next to" is the natural reading.
+            if ((string.IsNullOrEmpty(r.relation) || r.relation == "none") && !string.IsNullOrEmpty(r.target) && r.target != "none")
+                r.relation = "next_to";
+
             switch ((r.action ?? "add").ToLowerInvariant())
             {
                 case "add":
@@ -536,7 +578,6 @@ namespace VRoom
 
             var go = Instantiate(prefab, furnitureRoot);
             go.name = r.item;
-            Fit(go, entry.size);
 
             var piece = new Piece { item = r.item, go = go };
             var at = PlaceAt(piece, r);
@@ -587,6 +628,7 @@ namespace VRoom
             var go = p.go;
             float x = Mathf.Clamp(r.x, -roomHalf, roomHalf);
             float z = Mathf.Clamp(r.z, -roomHalf, roomHalf);
+            SnapToPosition(p, r.position, ref x, ref z);
 
             // Turn the front towards the room centre (snapped to 90 degrees), unless it stands in the middle.
             if (r.position != "center")
@@ -604,8 +646,7 @@ namespace VRoom
 
             target = FindFreeSpot(target, b.extents, lim, p);
 
-            go.transform.position += new Vector3(target.x - b.center.x, -b.min.y, target.z - b.center.z);
-            return target;
+            return Put(go, b, target);
         }
 
         /// <summary>
@@ -630,6 +671,11 @@ namespace VRoom
             foreach (var side in order)
             {
                 var c = SideCenter(a, b.extents, side, gap);
+                // Along the wall a deeper piece is simply pushed in from the wall, not rejected.
+                if (side == "right_of" || side == "left_of")
+                    c.z = Mathf.Clamp(c.z, -lim + b.extents.z, lim - b.extents.z);
+                else
+                    c.x = Mathf.Clamp(c.x, -lim + b.extents.x, lim - b.extents.x);
                 if (first == null) first = c;
                 bool inside = Mathf.Abs(c.x) + b.extents.x <= lim + 0.001f && Mathf.Abs(c.z) + b.extents.z <= lim + 0.001f;
                 if (inside && !Overlaps(c, b.extents, p)) return Put(go, b, c);
@@ -640,6 +686,56 @@ namespace VRoom
             f.x = Mathf.Clamp(f.x, -lim + b.extents.x, lim - b.extents.x);
             f.z = Mathf.Clamp(f.z, -lim + b.extents.z, lim - b.extents.z);
             return Put(go, b, FindFreeSpot(f, b.extents, lim, p));
+        }
+
+        static readonly Vector2[] CornerOrder =
+            { new Vector2(-1f, 1f), new Vector2(1f, 1f), new Vector2(-1f, -1f), new Vector2(1f, -1f) };
+
+        /// <summary>
+        /// Makes "against a wall" and "in a corner" exact, whatever numbers the model gave: a wall puts the piece
+        /// right at that wall, a corner at the nearest corner (or the first free one when the model gave none).
+        /// </summary>
+        void SnapToPosition(Piece p, string position, ref float x, ref float z)
+        {
+            switch (position)
+            {
+                case "near_window":
+                case "west_wall": x = -roomHalf; return;
+                case "east_wall": x = roomHalf; return;
+                case "north_wall": z = roomHalf; return;
+                case "south_wall": z = -roomHalf; return;
+
+                case "wall":
+                {
+                    // The nearest wall to the given spot; with no spot at all, the far (north) wall.
+                    float dW = x + roomHalf, dE = roomHalf - x, dS = z + roomHalf, dN = roomHalf - z;
+                    bool noSpot = Mathf.Abs(x) < 0.5f && Mathf.Abs(z) < 0.5f;
+                    float min = noSpot ? dN : Mathf.Min(Mathf.Min(dW, dE), Mathf.Min(dS, dN));
+                    if (Mathf.Approximately(min, dN)) z = roomHalf;
+                    else if (Mathf.Approximately(min, dW)) x = -roomHalf;
+                    else if (Mathf.Approximately(min, dE)) x = roomHalf;
+                    else z = -roomHalf;
+                    return;
+                }
+
+                case "corner":
+                {
+                    if (Mathf.Abs(x) >= 1f || Mathf.Abs(z) >= 1f)
+                    {
+                        x = x >= 0f ? roomHalf : -roomHalf;
+                        z = z >= 0f ? roomHalf : -roomHalf;
+                        return;
+                    }
+                    var ext = GetBounds(p.go).extents;
+                    foreach (var c in CornerOrder)
+                    {
+                        var spot = new Vector3(c.x * (roomHalf - ext.x), 0f, c.y * (roomHalf - ext.z));
+                        if (!Overlaps(spot, ext, p)) { x = c.x * roomHalf; z = c.y * roomHalf; return; }
+                    }
+                    x = -roomHalf; z = roomHalf;
+                    return;
+                }
+            }
         }
 
         static Vector3 SideCenter(Bounds a, Vector3 ext, string side, float gap)
@@ -655,7 +751,9 @@ namespace VRoom
 
         static Vector3 Put(GameObject go, Bounds b, Vector3 c)
         {
-            go.transform.position += new Vector3(c.x - b.center.x, -b.min.y, c.z - b.center.z);
+            // The bottom stands on the floor, or at the wall-mount height for things like a kitchen wall cabinet.
+            float lift = Catalog.TryGetValue(go.name, out var entry) ? entry.lift : 0f;
+            go.transform.position += new Vector3(c.x - b.center.x, lift - b.min.y, c.z - b.center.z);
             return c;
         }
 
@@ -680,22 +778,20 @@ namespace VRoom
 
         bool Overlaps(Vector3 center, Vector3 ext, Piece self)
         {
+            // Pieces at different heights do not collide (a wall cabinet hangs above a sink).
+            float selfBottom = Catalog.TryGetValue(self.item, out var entry) ? entry.lift : 0f;
+            float selfTop = selfBottom + GetBounds(self.go).size.y;
+
             foreach (var other in pieces)
             {
                 if (other == self) continue;
                 var p = GetBounds(other.go);
+                if (p.max.y <= selfBottom + 0.01f || p.min.y >= selfTop - 0.01f) continue;
                 if (Mathf.Abs(center.x - p.center.x) < ext.x + p.extents.x &&
                     Mathf.Abs(center.z - p.center.z) < ext.z + p.extents.z)
                     return true;
             }
             return false;
-        }
-
-        static void Fit(GameObject go, float largestSide)
-        {
-            var b = GetBounds(go);
-            float max = Mathf.Max(b.size.x, Mathf.Max(b.size.y, b.size.z));
-            if (max > 0.0001f) go.transform.localScale *= largestSide / max;
         }
 
         static Bounds GetBounds(GameObject go)

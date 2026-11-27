@@ -2,6 +2,12 @@
 
 # Character View starter
 
+## Download (Windows)
+
+Download the installer: https://github.com/IT-Kamianets/VRoom/releases/latest/download/VRoom-Setup.exe
+
+Every change on `master` builds a new one automatically. How it works and what to set up: [RELEASING.md](RELEASING.md).
+
 Start a **Character View** game on the [IT Kamianets 3D Engine](https://3d.itkamianets.com): 1st + 3rd person, games like GTA V, Cyberpunk 2077, Elden Ring.
 
 The camera and controls for this style are ready.

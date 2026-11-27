@@ -84,8 +84,21 @@ namespace VRoom
                 return googleOAuthClientJson.text;
             }
 
-            var path = System.IO.Path.Combine(Application.dataPath, "VRoom/Firebase/google-oauth-client.json");
-            return System.IO.File.Exists(path) ? System.IO.File.ReadAllText(path) : null;
+            // In the installed game the build copies the file into the streaming assets (BuildWindows.cs); in the
+            // editor it is read from the Firebase folder of the project.
+            foreach (var path in new[]
+            {
+                System.IO.Path.Combine(Application.streamingAssetsPath, "google-oauth-client.json"),
+                System.IO.Path.Combine(Application.dataPath, "VRoom/Firebase/google-oauth-client.json"),
+            })
+            {
+                if (System.IO.File.Exists(path))
+                {
+                    return System.IO.File.ReadAllText(path);
+                }
+            }
+
+            return null;
         }
 
         private async void Start()

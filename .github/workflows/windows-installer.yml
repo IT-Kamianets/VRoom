@@ -1,0 +1,102 @@
+name: Windows installer
+
+# Every change on master builds the Windows game, packs it into VRoom-Setup.exe and publishes it as a new GitHub
+# release, so https://github.com/IT-Kamianets/VRoom/releases/latest/download/VRoom-Setup.exe is always the newest build.
+# Secrets to add (Settings > Secrets and variables > Actions), see RELEASING.md:
+#   UNITY_LICENSE, UNITY_EMAIL, UNITY_PASSWORD   the Unity Personal licence used to build in CI
+#   GOOGLE_OAUTH_CLIENT_JSON                     the whole content of google-oauth-client.json (Google sign-in)
+
+on:
+    push:
+        branches:
+            - master
+        paths-ignore:
+            - "docs/**"
+            - "Blender/**"
+            - "**.md"
+    workflow_dispatch:
+
+concurrency:
+    group: windows-installer
+    cancel-in-progress: true
+
+permissions:
+    contents: write
+
+env:
+    VERSION: 0.1.${{ github.run_number }}
+
+jobs:
+    build:
+        name: Build the Windows player
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  lfs: true
+
+            - uses: actions/cache@v4
+              with:
+                  path: Library
+                  key: Library-Windows-${{ hashFiles('Packages/packages-lock.json', 'ProjectSettings/ProjectVersion.txt') }}
+                  restore-keys: Library-Windows-
+
+            - name: Add the Google OAuth client (not in git)
+              env:
+                  GOOGLE_OAUTH_CLIENT_JSON: ${{ secrets.GOOGLE_OAUTH_CLIENT_JSON }}
+              run: |
+                  if [ -n "$GOOGLE_OAUTH_CLIENT_JSON" ]; then
+                      printf '%s' "$GOOGLE_OAUTH_CLIENT_JSON" > Assets/VRoom/Firebase/google-oauth-client.json
+                  else
+                      echo "::warning::GOOGLE_OAUTH_CLIENT_JSON is not set: Google sign-in will not work in this build."
+                  fi
+
+            - uses: game-ci/unity-builder@v4
+              env:
+                  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+                  UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+                  UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+              with:
+                  unityVersion: auto
+                  targetPlatform: StandaloneWindows64
+                  buildMethod: VRoom.EditorTools.BuildWindows.Run
+                  customParameters: -nographics
+                  versioning: Custom
+                  version: ${{ env.VERSION }}
+                  allowDirtyBuild: true
+
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: VRoom-Windows
+                  path: Builds/Windows
+                  if-no-files-found: error
+
+    installer:
+        name: Pack the installer and publish it
+        needs: build
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/download-artifact@v4
+              with:
+                  name: VRoom-Windows
+                  path: Builds/Windows
+
+            - name: Install Inno Setup
+              run: choco install innosetup --no-progress -y
+
+            - name: Build VRoom-Setup.exe
+              shell: pwsh
+              run: |
+                  & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=${{ env.VERSION }}" Tools/installer/VRoom.iss
+                  Compress-Archive -Path Builds/Windows/* -DestinationPath Builds/Installer/VRoom-Windows.zip -Force
+
+            - name: Publish the release
+              shell: pwsh
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  gh release create "v${{ env.VERSION }}" Builds/Installer/VRoom-Setup.exe Builds/Installer/VRoom-Windows.zip `
+                      --repo "${{ github.repository }}" --title "VRoom ${{ env.VERSION }}" `
+                      --notes "Automatic Windows build of commit ${{ github.sha }}." --latest

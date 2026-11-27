@@ -122,3 +122,8 @@ desktop.ini
 # Google OAuth client (Desktop app) with its secret: each developer keeps their own copy
 /Assets/VRoom/Firebase/google-oauth-client.json
 /Assets/VRoom/Firebase/google-oauth-client.json.meta
+
+# Windows builds and installers (see RELEASING.md); the OAuth file is copied here only while building
+/Builds/
+/Assets/StreamingAssets/google-oauth-client.json
+/Assets/StreamingAssets/google-oauth-client.json.meta

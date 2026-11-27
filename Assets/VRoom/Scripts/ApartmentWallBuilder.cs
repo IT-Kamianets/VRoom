@@ -5,11 +5,13 @@ using UnityEngine;
 namespace VRoom
 {
     /// <summary>
-    /// Window with 3 inputs (wall width, wall height, right corner angle). Every press of "Побудувати стіну" adds the
-    /// next exterior wall of the apartment: the first one starts at the origin and runs along +x, each next wall starts
-    /// where the previous one ended and turns by the previous wall's right corner angle (interior angle, 90 = right angle),
-    /// so the contour goes counter-clockwise seen from above. When the end of a wall meets the start of the first wall
-    /// the contour is closed and the corner between the last and the first wall is joined.
+    /// Builds the exterior walls of apartments from three inputs (wall width, wall height, right corner angle).
+    /// Every press of "Побудувати стіну" adds the next wall: the first one starts at the origin and runs along +x,
+    /// each next wall starts where the previous one ended and turns by the previous wall's right corner angle
+    /// (interior angle, 90 = right angle, 270 = the contour turns outwards), so the contour goes counter-clockwise
+    /// seen from above. When the end of a wall meets the start of the first wall the contour is closed.
+    /// Apartments are kept as projects: the "Проєкти" page lists them, opens, deletes and creates new ones. Everything is
+    /// saved to a file after every change, so closing the window or the game loses nothing.
     /// </summary>
     public class ApartmentWallBuilder : MonoBehaviour
     {
@@ -17,22 +19,130 @@ namespace VRoom
         [SerializeField] Color wallColor = new Color(0.85f, 0.82f, 0.76f);
         [SerializeField] float closeTolerance = 0.15f;
 
-        struct Wall { public float width, height, angle; }
+        [System.Serializable] struct Wall { public float width, height, angle; }
+        [System.Serializable] class Project { public string name; public List<Wall> walls = new List<Wall>(); public bool closed; }
+        [System.Serializable] class SaveData { public List<Project> projects = new List<Project>(); public int current = -1; }
+        [System.Serializable] class LegacySave { public List<Wall> walls = new List<Wall>(); public bool closed; }
 
-        readonly List<Wall> _walls = new List<Wall>();
-        bool _closed;
+        enum Page { Projects, Editor }
 
-        string _width = "6", _height = "2.7", _angle = "90";
+        static string SavePath => System.IO.Path.Combine(Application.persistentDataPath, "apartment_projects.json");
+        static string LegacyPath => System.IO.Path.Combine(Application.persistentDataPath, "apartment_walls.json");
+
+        readonly List<Project> _projects = new List<Project>();
+        int _cur = -1;                         // index of the open project, -1 = none
+        List<Wall> _walls = new List<Wall>();  // walls of the open project
+        bool _closed;                          // is its contour closed
+
+        Page _page = Page.Projects;
+        string _width = "6", _height = "2.7", _angle = "90", _newName = "";
         string _message = "";
         bool _error;
         bool _visible = true;
+        int _confirmDelete = -1;
+        Vector2 _scroll;
         GameObject _wall;
 
         // Window size is fixed here (in "virtual" pixels, scaled to the screen); only the dragged position is remembered.
-        const float WinW = 560f, WinH = 850f;
-        Vector2 _pos = new Vector2(-1f, 20f); // x < 0: not placed yet, docks to the right edge
-        GUIStyle _win, _label, _field, _button, _button2, _msg;
+        const float WinW = 480f, WinH = 640f;
+        Vector2 _pos = new Vector2(-1f, 110f); // x < 0: not placed yet, docks to the right edge
+        GUIStyle _win, _label, _field, _button, _button2, _msg, _row;
         Texture2D _bg, _fieldBg, _btnBg, _btn2Bg;
+
+        // ---------------------------------------------------------------- saving
+
+        void Save()
+        {
+            try
+            {
+                if (_cur >= 0 && _cur < _projects.Count)
+                {
+                    _projects[_cur].walls = _walls;
+                    _projects[_cur].closed = _closed;
+                }
+                System.IO.File.WriteAllText(SavePath, JsonUtility.ToJson(new SaveData { projects = _projects, current = _cur }));
+            }
+            catch (System.Exception e) { Debug.LogWarning("Не вдалося зберегти проєкти: " + e.Message); }
+        }
+
+        void Load()
+        {
+            try
+            {
+                if (System.IO.File.Exists(SavePath))
+                {
+                    var data = JsonUtility.FromJson<SaveData>(System.IO.File.ReadAllText(SavePath));
+                    if (data != null && data.projects != null) { _projects.AddRange(data.projects); _cur = data.current; }
+                }
+                else if (System.IO.File.Exists(LegacyPath))
+                {
+                    // the single apartment saved by the earlier version becomes the first project
+                    var old = JsonUtility.FromJson<LegacySave>(System.IO.File.ReadAllText(LegacyPath));
+                    if (old != null && old.walls != null && old.walls.Count > 0)
+                    {
+                        _projects.Add(new Project { name = "Квартира 1", walls = old.walls, closed = old.closed });
+                        _cur = 0;
+                    }
+                }
+            }
+            catch (System.Exception e) { Debug.LogWarning("Не вдалося завантажити проєкти: " + e.Message); }
+
+            if (_cur >= 0 && _cur < _projects.Count)
+            {
+                OpenProject(_cur, false);
+                _visible = true; // always show the window on start, so the project list is reachable without the small button
+            }
+            else
+            {
+                _cur = -1;
+                _page = Page.Projects;
+            }
+        }
+
+        // ---------------------------------------------------------------- projects
+
+        void OpenProject(int index, bool saveCurrent = true)
+        {
+            if (saveCurrent) Save();
+            _cur = index;
+            _walls = new List<Wall>(_projects[index].walls);
+            _closed = _projects[index].closed;
+            _page = Page.Editor;
+            _confirmDelete = -1;
+            _error = false;
+            _message = _closed ? "Контур замкнено: " + _walls.Count + " стін." : (_walls.Count > 0 ? "Продовжуй зі стіни №" + (_walls.Count + 1) + "." : "");
+            Rebuild();
+        }
+
+        void CreateProject()
+        {
+            Save();
+            string name = _newName.Trim();
+            if (name == "") name = "Квартира " + (_projects.Count + 1);
+            _projects.Add(new Project { name = name });
+            _newName = "";
+            OpenProject(_projects.Count - 1, false);
+            _message = "Проєкт «" + name + "» створено. Вводь стіни.";
+        }
+
+        void DeleteProject(int index)
+        {
+            string name = _projects[index].name;
+            if (index == _cur)
+            {
+                _cur = -1;
+                _walls = new List<Wall>();
+                _closed = false;
+            }
+            else if (index < _cur) _cur--;
+            _projects.RemoveAt(index);
+            _confirmDelete = -1;
+            _error = false;
+            _message = "Проєкт «" + name + "» видалено.";
+            Rebuild();
+        }
+
+        // ---------------------------------------------------------------- GUI
 
         static Texture2D Tex(Color c)
         {
@@ -49,20 +159,21 @@ namespace VRoom
             _fieldBg = Tex(Color.white);
             _btnBg = Tex(new Color(0.95f, 0.62f, 0.10f));
             _btn2Bg = Tex(new Color(0.75f, 0.78f, 0.88f));
-            _win = new GUIStyle(GUI.skin.window) { fontSize = 26, fontStyle = FontStyle.Bold, alignment = TextAnchor.UpperCenter, padding = new RectOffset(30, 30, 70, 30) };
+            _win = new GUIStyle(GUI.skin.window) { fontSize = 22, fontStyle = FontStyle.Bold, alignment = TextAnchor.UpperCenter, padding = new RectOffset(24, 24, 56, 20) };
             _win.normal.background = _win.onNormal.background = _bg;
             _win.normal.textColor = _win.onNormal.textColor = new Color(1f, 0.8f, 0.3f);
-            _label = new GUIStyle(GUI.skin.label) { fontSize = 24, margin = new RectOffset(0, 0, 14, 4) };
+            _label = new GUIStyle(GUI.skin.label) { fontSize = 20, margin = new RectOffset(0, 0, 8, 2) };
             _label.normal.textColor = Color.white;
-            _field = new GUIStyle(GUI.skin.textField) { fontSize = 28, alignment = TextAnchor.MiddleLeft };
+            _field = new GUIStyle(GUI.skin.textField) { fontSize = 24, alignment = TextAnchor.MiddleLeft };
             _field.normal.background = _field.focused.background = _field.hover.background = _fieldBg;
             _field.normal.textColor = _field.focused.textColor = _field.hover.textColor = Color.black;
-            _button = new GUIStyle(GUI.skin.button) { fontSize = 28, fontStyle = FontStyle.Bold, margin = new RectOffset(0, 0, 24, 0) };
+            _button = new GUIStyle(GUI.skin.button) { fontSize = 24, fontStyle = FontStyle.Bold, margin = new RectOffset(0, 0, 14, 0) };
             _button.normal.background = _button.hover.background = _button.active.background = _btnBg;
             _button.normal.textColor = _button.hover.textColor = _button.active.textColor = Color.black;
-            _button2 = new GUIStyle(_button) { fontSize = 22, margin = new RectOffset(0, 0, 10, 0) };
+            _button2 = new GUIStyle(_button) { fontSize = 19, margin = new RectOffset(0, 0, 6, 0) };
             _button2.normal.background = _button2.hover.background = _button2.active.background = _btn2Bg;
-            _msg = new GUIStyle(_label) { wordWrap = true, fontSize = 22 };
+            _msg = new GUIStyle(_label) { wordWrap = true, fontSize = 19 };
+            _row = new GUIStyle(_label) { fontSize = 19, wordWrap = true, alignment = TextAnchor.MiddleLeft, margin = new RectOffset(0, 0, 6, 6) };
         }
 
         void OnGUI()
@@ -74,38 +185,80 @@ namespace VRoom
             if (!_visible)
             {
                 // The window is hidden (closed by the user or after the contour was closed): a small button brings it back.
-                if (GUI.Button(new Rect(Screen.width / s - 290f, 30f, 260f, 60f), "Показати вікно", _button2)) _visible = true;
+                if (GUI.Button(new Rect(Screen.width / s - 250f, 20f, 220f, 50f), "Показати вікно", _button2)) _visible = true;
                 return;
             }
-            var r = GUI.Window(7421, new Rect(_pos.x, _pos.y, WinW, WinH), DrawWindow, "Зовнішня стіна квартири", _win);
+            bool projects = _page == Page.Projects;
+            var r = GUI.Window(7421, new Rect(_pos.x, _pos.y, WinW, WinH), projects ? (GUI.WindowFunction)DrawProjects : DrawEditor,
+                projects ? "Проєкти" : "Зовнішня стіна квартири", _win);
             _pos = r.position;
         }
 
-        void DrawWindow(int id)
+        void DrawProjects(int id)
         {
-            GUILayout.Label(_closed ? "Контур замкнено" : "Стіна №" + (_walls.Count + 1), _label);
+            GUILayout.Label(_projects.Count == 0 ? "Поки що немає проєктів. Створи перший." : "Мої квартири (" + _projects.Count + ")", _label);
+
+            _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.Height(280));
+            for (int i = 0; i < _projects.Count; i++)
+            {
+                var p = _projects[i];
+                var walls = i == _cur ? _walls : p.walls;
+                bool closed = i == _cur ? _closed : p.closed;
+                GUILayout.BeginHorizontal();
+                GUILayout.Label((i == _cur ? "▶ " : "") + p.name + "\n" + walls.Count + " стін" + (closed ? " · замкнено" : ""), _row, GUILayout.Width(200));
+                if (GUILayout.Button("Відкрити", _button2, GUILayout.Height(44), GUILayout.Width(104))) { int idx = i; _pending = () => OpenProject(idx); }
+                bool sure = _confirmDelete == i;
+                if (GUILayout.Button(sure ? "Точно?" : "Видалити", _button2, GUILayout.Height(44), GUILayout.Width(104)))
+                {
+                    if (sure) { int idx = i; _pending = () => DeleteProject(idx); }
+                    else _confirmDelete = i;
+                }
+                GUILayout.EndHorizontal();
+            }
+            GUILayout.EndScrollView();
+
+            GUILayout.Label("Назва нового проєкту", _label);
+            _newName = GUILayout.TextField(_newName, _field, GUILayout.Height(44));
+            if (GUILayout.Button("Створити новий проєкт", _button, GUILayout.Height(54))) _pending = CreateProject;
+
+            _msg.normal.textColor = _error ? new Color(1f, 0.45f, 0.45f) : new Color(0.6f, 0.95f, 0.6f);
+            if (_message != "") GUILayout.Label(_message, _msg);
+            if (GUILayout.Button("Закрити вікно", _button2, GUILayout.Height(42))) _visible = false;
+            GUI.DragWindow(new Rect(0, 0, 10000, 50));
+        }
+
+        void DrawEditor(int id)
+        {
+            string name = _cur >= 0 && _cur < _projects.Count ? _projects[_cur].name : "";
+            GUILayout.Label(name + " · " + (_closed ? "контур замкнено" : "стіна №" + (_walls.Count + 1)), _label);
 
             GUI.enabled = !_closed;
             GUILayout.Label("Ширина стіни, м", _label);
-            _width = GUILayout.TextField(_width, _field, GUILayout.Height(56));
+            _width = GUILayout.TextField(_width, _field, GUILayout.Height(44));
             GUILayout.Label("Висота стіни, м", _label);
-            _height = GUILayout.TextField(_height, _field, GUILayout.Height(56));
+            _height = GUILayout.TextField(_height, _field, GUILayout.Height(44));
             GUILayout.Label("Правий кут, °", _label);
-            _angle = GUILayout.TextField(_angle, _field, GUILayout.Height(56));
-            if (GUILayout.Button("Побудувати стіну", _button, GUILayout.Height(70))) AddWall();
-            if (GUILayout.Button("Замкнути контур", _button2, GUILayout.Height(50))) CloseNow();
+            _angle = GUILayout.TextField(_angle, _field, GUILayout.Height(44));
+            if (GUILayout.Button("Побудувати стіну", _button, GUILayout.Height(54))) _pending = AddWall;
+            if (GUILayout.Button("Замкнути контур", _button2, GUILayout.Height(42))) _pending = CloseNow;
             GUI.enabled = true;
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Скасувати останню", _button2, GUILayout.Height(50))) Undo();
-            if (GUILayout.Button("Почати спочатку", _button2, GUILayout.Height(50))) Reset();
+            if (GUILayout.Button("Скасувати останню", _button2, GUILayout.Height(42))) _pending = Undo;
+            if (GUILayout.Button("Стерти всі стіни", _button2, GUILayout.Height(42))) _pending = Reset;
             GUILayout.EndHorizontal();
 
             _msg.normal.textColor = _error ? new Color(1f, 0.45f, 0.45f) : new Color(0.6f, 0.95f, 0.6f);
             if (_message != "") GUILayout.Label(_message, _msg);
-            if (GUILayout.Button("Закрити вікно", _button2, GUILayout.Height(50))) _visible = false;
-            GUI.DragWindow(new Rect(0, 0, 10000, 60));
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Проєкти", _button2, GUILayout.Height(42))) _pending = ShowProjects;
+            if (GUILayout.Button("Закрити вікно", _button2, GUILayout.Height(42))) _visible = false;
+            GUILayout.EndHorizontal();
+            GUI.DragWindow(new Rect(0, 0, 10000, 50));
         }
+
+        // ---------------------------------------------------------------- editing
 
         static bool Parse(string s, out float v) =>
             float.TryParse(s.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out v);
@@ -115,9 +268,9 @@ namespace VRoom
         void AddWall()
         {
             if (!Parse(_width, out var w) || !Parse(_height, out var h) || !Parse(_angle, out var a)) { Fail("Введи числа."); return; }
-            if (w < 0.5f || w > 50f || h < 1f || h > 10f || a < 30f || a > 330f)
+            if (w < 0.1f || w > 50f || h < 1f || h > 10f || a < 30f || a > 330f)
             {
-                Fail("Ширина 0.5–50, висота 1–10, кут 30–330 (270 = внутрішній кут назовні).");
+                Fail("Ширина 0.1–50, висота 1–10, кут 30–330 (270 = внутрішній кут назовні).");
                 return;
             }
             _walls.Add(new Wall { width = w, height = h, angle = a });
@@ -126,7 +279,7 @@ namespace VRoom
             if (_walls.Count >= 3 && Vector2.Distance(pts[pts.Count - 1], pts[0]) < closeTolerance)
             {
                 _closed = true;
-                _message = "Контур замкнено: " + _walls.Count + " стін.";
+                _message = "Контур замкнено: " + _walls.Count + " стін. Проєкт збережено.";
                 _visible = false;
             }
             else
@@ -151,7 +304,7 @@ namespace VRoom
             if (gap > 1.5f) { Fail("До початку ще " + gap.ToString("0.00", CultureInfo.InvariantCulture) + " м: контур не замикається. Перевір довжини й кути (внутрішній кут назовні = 270)."); return; }
             _closed = true;
             _error = false;
-            _message = "Контур замкнено, останній кут підтягнуто на " + gap.ToString("0.00", CultureInfo.InvariantCulture) + " м.";
+            _message = "Контур замкнено, останній кут підтягнуто на " + gap.ToString("0.00", CultureInfo.InvariantCulture) + " м. Проєкт збережено.";
             _visible = false;
             Rebuild();
         }
@@ -169,7 +322,8 @@ namespace VRoom
         {
             _walls.Clear();
             _closed = false;
-            _message = "";
+            _message = "Стіни проєкту стерто. Можна вводити заново.";
+            _error = false;
             Rebuild();
         }
 
@@ -190,6 +344,7 @@ namespace VRoom
 
         void Rebuild()
         {
+            Save();
             if (_wall != null) Destroy(_wall);
             if (_walls.Count == 0) return;
 
@@ -202,6 +357,24 @@ namespace VRoom
             _wall.GetComponent<MeshRenderer>().sharedMaterial = mat;
             FrameCamera(pts);
         }
+
+        void Start() { Load(); }
+
+        // GUI buttons only queue an action; it runs here, outside OnGUI, so the lists never change in the middle of drawing.
+        System.Action _pending;
+
+        void Update()
+        {
+            if (_page == Page.Editor && (_cur < 0 || _cur >= _projects.Count)) { _cur = -1; _page = Page.Projects; } // never stay on the editor without a project
+            if (_pending == null) return;
+            var action = _pending;
+            _pending = null;
+            action();
+        }
+
+        void ShowProjects() { Save(); _page = Page.Projects; _confirmDelete = -1; _message = ""; }
+
+        // ---------------------------------------------------------------- camera and mesh
 
         // Frames the contour in the left part of the screen so that the window on the right never covers it.
         void FrameCamera(List<Vector2> pts)

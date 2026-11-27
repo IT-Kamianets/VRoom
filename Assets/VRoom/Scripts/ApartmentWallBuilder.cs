@@ -13,14 +13,15 @@ namespace VRoom
     /// Apartments are kept as projects: the "Проєкти" page lists them, opens, deletes and creates new ones. Everything is
     /// saved to a file after every change, so closing the window or the game loses nothing.
     /// </summary>
-    public class ApartmentWallBuilder : MonoBehaviour
+    public partial class ApartmentWallBuilder : MonoBehaviour
     {
         [SerializeField] float thickness = 0.3f;
-        [SerializeField] Color wallColor = new Color(0.85f, 0.82f, 0.76f);
+        [SerializeField] Color wallColor = new Color(0.97f, 0.94f, 0.88f);
         [SerializeField] float closeTolerance = 0.15f;
 
         [System.Serializable] struct Wall { public float width, height, angle; }
-        [System.Serializable] class Project { public string name; public List<Wall> walls = new List<Wall>(); public bool closed; }
+        // ox, oz, h0: where the first corner is on the ground and which way the first wall runs (changes when a corner is dragged in the 2D plan)
+        [System.Serializable] class Project { public string name; public List<Wall> walls = new List<Wall>(); public bool closed; public float ox, oz, h0; public List<Inner> inner = new List<Inner>(); }
         [System.Serializable] class SaveData { public List<Project> projects = new List<Project>(); public int current = -1; }
         [System.Serializable] class LegacySave { public List<Wall> walls = new List<Wall>(); public bool closed; }
 
@@ -44,8 +45,8 @@ namespace VRoom
         GameObject _wall;
 
         // Window size is fixed here (in "virtual" pixels, scaled to the screen); only the dragged position is remembered.
-        const float WinW = 480f, WinH = 640f;
-        Vector2 _pos = new Vector2(-1f, 110f); // x < 0: not placed yet, docks to the right edge
+        const float WinW = 480f, WinH = 680f;
+        Vector2 _pos = new Vector2(-1f, 60f); // x < 0: not placed yet, docks to the right edge
         GUIStyle _win, _label, _field, _button, _button2, _msg, _row;
         Texture2D _bg, _fieldBg, _btnBg, _btn2Bg;
 
@@ -59,6 +60,10 @@ namespace VRoom
                 {
                     _projects[_cur].walls = _walls;
                     _projects[_cur].closed = _closed;
+                    _projects[_cur].ox = _origin.x;
+                    _projects[_cur].oz = _origin.y;
+                    _projects[_cur].h0 = _h0;
+                    _projects[_cur].inner = _inner;
                 }
                 System.IO.File.WriteAllText(SavePath, JsonUtility.ToJson(new SaveData { projects = _projects, current = _cur }));
             }
@@ -107,6 +112,13 @@ namespace VRoom
             _cur = index;
             _walls = new List<Wall>(_projects[index].walls);
             _closed = _projects[index].closed;
+            _origin = new Vector2(_projects[index].ox, _projects[index].oz);
+            _h0 = _projects[index].h0;
+            _inner = new List<Inner>(_projects[index].inner ?? new List<Inner>());
+            _selInner = -1;
+            _drawInner = false;
+            ClearHistory();
+            _selected = -1;
             _page = Page.Editor;
             _confirmDelete = -1;
             _error = false;
@@ -132,7 +144,9 @@ namespace VRoom
             {
                 _cur = -1;
                 _walls = new List<Wall>();
+                _inner = new List<Inner>();
                 _closed = false;
+                ClearHistory();
             }
             else if (index < _cur) _cur--;
             _projects.RemoveAt(index);
@@ -179,15 +193,14 @@ namespace VRoom
         void OnGUI()
         {
             InitStyles();
+            if (_plan2D) PlanGUI();   // grid, sizes and corner handles of the 2D plan, drawn in screen pixels
+            ModesGUI();               // mouse and keys of god mode and walking
+            HistoryKeys();            // Ctrl+Z and Ctrl+Y
             float s = Screen.height / 900f;
             GUI.matrix = Matrix4x4.Scale(new Vector3(s, s, 1f));
-            if (_pos.x < 0f) _pos.x = Screen.width / s - WinW - 30f;
-            if (!_visible)
-            {
-                // The window is hidden (closed by the user or after the contour was closed): a small button brings it back.
-                if (GUI.Button(new Rect(Screen.width / s - 250f, 20f, 220f, 50f), "Показати вікно", _button2)) _visible = true;
-                return;
-            }
+            if (_pos.x < 0f) _pos.x = Screen.width / s - WinW - ToolW - 40f;
+            DrawSideBar(s);   // the buttons at the side: window, projects, walls, 2D plan, view modes, undo and redo
+            if (!_visible) return;
             bool projects = _page == Page.Projects;
             var r = GUI.Window(7421, new Rect(_pos.x, _pos.y, WinW, WinH), projects ? (GUI.WindowFunction)DrawProjects : DrawEditor,
                 projects ? "Проєкти" : "Зовнішня стіна квартири", _win);
@@ -229,6 +242,7 @@ namespace VRoom
 
         void DrawEditor(int id)
         {
+            if (_plan2D) { DrawPlanPanel(); return; }
             string name = _cur >= 0 && _cur < _projects.Count ? _projects[_cur].name : "";
             GUILayout.Label(name + " · " + (_closed ? "контур замкнено" : "стіна №" + (_walls.Count + 1)), _label);
 
@@ -244,17 +258,15 @@ namespace VRoom
             GUI.enabled = true;
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Скасувати останню", _button2, GUILayout.Height(42))) _pending = Undo;
+            if (GUILayout.Button("Видалити останню", _button2, GUILayout.Height(42))) _pending = Undo;
             if (GUILayout.Button("Стерти всі стіни", _button2, GUILayout.Height(42))) _pending = Reset;
             GUILayout.EndHorizontal();
+            if (GUILayout.Button("Внутрішні стіни за планом", _button2, GUILayout.Height(42))) _pending = LoadPlanLayout;
 
             _msg.normal.textColor = _error ? new Color(1f, 0.45f, 0.45f) : new Color(0.6f, 0.95f, 0.6f);
             if (_message != "") GUILayout.Label(_message, _msg);
 
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Проєкти", _button2, GUILayout.Height(42))) _pending = ShowProjects;
             if (GUILayout.Button("Закрити вікно", _button2, GUILayout.Height(42))) _visible = false;
-            GUILayout.EndHorizontal();
             GUI.DragWindow(new Rect(0, 0, 10000, 50));
         }
 
@@ -273,6 +285,7 @@ namespace VRoom
                 Fail("Ширина 0.1–50, висота 1–10, кут 30–330 (270 = внутрішній кут назовні).");
                 return;
             }
+            PushUndo();
             _walls.Add(new Wall { width = w, height = h, angle = a });
 
             var pts = Points();
@@ -302,6 +315,7 @@ namespace VRoom
             if (_closed || _walls.Count < 3) { Fail("Для замикання потрібно щонайменше 3 стіни."); return; }
             float gap = Gap();
             if (gap > 1.5f) { Fail("До початку ще " + gap.ToString("0.00", CultureInfo.InvariantCulture) + " м: контур не замикається. Перевір довжини й кути (внутрішній кут назовні = 270)."); return; }
+            PushUndo();
             _closed = true;
             _error = false;
             _message = "Контур замкнено, останній кут підтягнуто на " + gap.ToString("0.00", CultureInfo.InvariantCulture) + " м. Проєкт збережено.";
@@ -311,7 +325,8 @@ namespace VRoom
 
         void Undo()
         {
-            if (_walls.Count == 0) return;
+            if (_walls.Count == 0) { if (_floor != null) Destroy(_floor); return; }
+            PushUndo();
             _walls.RemoveAt(_walls.Count - 1);
             _closed = false;
             _message = "";
@@ -320,8 +335,14 @@ namespace VRoom
 
         void Reset()
         {
+            PushUndo();
             _walls.Clear();
+            _inner.Clear();
+            _selInner = -1;
             _closed = false;
+            _origin = Vector2.zero;
+            _h0 = 0f;
+            _selected = -1;
             _message = "Стіни проєкту стерто. Можна вводити заново.";
             _error = false;
             Rebuild();
@@ -330,8 +351,8 @@ namespace VRoom
         /// <summary>Corner centres in plan (x, z): start of wall 0, then the end of every wall.</summary>
         List<Vector2> Points()
         {
-            var pts = new List<Vector2> { Vector2.zero };
-            float heading = 0f;
+            var pts = new List<Vector2> { _origin };
+            float heading = _h0;
             foreach (var wall in _walls)
             {
                 var dir = new Vector2(Mathf.Cos(heading * Mathf.Deg2Rad), Mathf.Sin(heading * Mathf.Deg2Rad));
@@ -344,27 +365,67 @@ namespace VRoom
 
         void Rebuild()
         {
-            Save();
+            if (!Dragging) Save();   // while a corner is being dragged, save once when the mouse is released
+            BuildInner();
             if (_wall != null) Destroy(_wall);
-            if (_walls.Count == 0) return;
+            if (_walls.Count == 0) { if (_floor != null) Destroy(_floor); return; }
 
             _wall = new GameObject("ExteriorWalls", typeof(MeshFilter), typeof(MeshRenderer));
             _wall.transform.SetParent(transform, false);
             var pts = Points();
-            _wall.GetComponent<MeshFilter>().sharedMesh = BuildMesh(pts, _walls, _closed, thickness);
+            var wallMesh = BuildMesh(pts, _walls, _closed, thickness);
+            _wall.GetComponent<MeshFilter>().sharedMesh = wallMesh;
             var mat = new Material(Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard"));
             mat.color = wallColor;
             _wall.GetComponent<MeshRenderer>().sharedMaterial = mat;
-            FrameCamera(pts);
+            UpdateFloorAndCollider(pts, wallMesh);
+            if (Dragging) return;   // the camera stays still while dragging
+            if (_plan2D) FramePlan(pts);
+            else if (_camMode == CamMode.Overview) FrameCamera(pts);
+            else if (_camMode == CamMode.God) FitGod(pts);
         }
 
-        void Start() { Load(); }
+        void Start()
+        {
+            CreateBackdrop();
+            Load();
+        }
+
+        // A backdrop that makes the light walls readable: a deep navy sky, a slate-blue ground they stand on, and a haze where the two meet.
+        void CreateBackdrop()
+        {
+            var sky = new Color(0.13f, 0.17f, 0.27f);   // deep navy: the light walls stand out against it
+            var cam = Camera.main;
+            if (cam != null)
+            {
+                cam.clearFlags = CameraClearFlags.SolidColor;
+                cam.backgroundColor = sky;
+            }
+
+            RenderSettings.fog = true;
+            RenderSettings.fogColor = sky;
+            RenderSettings.fogMode = FogMode.Linear;
+            RenderSettings.fogStartDistance = 45f;
+            RenderSettings.fogEndDistance = 140f;
+
+            var ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            ground.name = "Ground";
+            Destroy(ground.GetComponent<Collider>());
+            ground.transform.SetParent(transform, false);
+            ground.transform.position = new Vector3(0f, -0.02f, 0f);
+            ground.transform.localScale = new Vector3(60f, 1f, 60f);   // 600 x 600 m
+            var mat = new Material(Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard"));
+            mat.color = new Color(0.20f, 0.25f, 0.36f);
+            mat.SetFloat("_Smoothness", 0.1f);
+            ground.GetComponent<Renderer>().sharedMaterial = mat;
+        }
 
         // GUI buttons only queue an action; it runs here, outside OnGUI, so the lists never change in the middle of drawing.
         System.Action _pending;
 
         void Update()
         {
+            UpdateModes();
             if (_page == Page.Editor && (_cur < 0 || _cur >= _projects.Count)) { _cur = -1; _page = Page.Projects; } // never stay on the editor without a project
             if (_pending == null) return;
             var action = _pending;
@@ -395,7 +456,7 @@ namespace VRoom
             var c = new Vector3((min.x + max.x) * 0.5f, maxH * 0.5f, (min.y + max.y) * 0.5f);
 
             float s = Screen.height / 900f;
-            float freeRight = 1f - (WinW + 60f) * s / Screen.width;   // the window takes the right part of the screen
+            float freeRight = 1f - (WinW + 60f + ToolW) * s / Screen.width;   // the window takes the right part of the screen
             freeRight = Mathf.Clamp(freeRight, 0.35f, 0.95f);
             const float margin = 0.04f;
             float targetX = freeRight * 0.5f;

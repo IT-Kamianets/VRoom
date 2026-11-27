@@ -64,7 +64,7 @@ namespace VRoom
                 return;
             }
 
-            var client = googleOAuthClientJson != null ? JsonUtility.FromJson<OAuthClientFile>(googleOAuthClientJson.text)?.installed : null;
+            var client = JsonUtility.FromJson<OAuthClientFile>(OAuthClientText() ?? "{}")?.installed;
             if (client == null || string.IsNullOrEmpty(client.client_id) || string.IsNullOrEmpty(client.client_secret))
             {
                 _status = "Немає файлу Google OAuth (google-oauth-client.json).";
@@ -73,6 +73,19 @@ namespace VRoom
 
             Run(() => _firebase.Auth.SignInWithGoogleAsync(client.client_id, client.client_secret), "");
             _status = "Завершіть вхід у браузері…";
+        }
+
+        // The assigned asset, or else the file itself next to google-services.json: the file is git-ignored, so its
+        // asset reference in a scene only works on the machine where it was first imported.
+        private string OAuthClientText()
+        {
+            if (googleOAuthClientJson != null)
+            {
+                return googleOAuthClientJson.text;
+            }
+
+            var path = System.IO.Path.Combine(Application.dataPath, "VRoom/Firebase/google-oauth-client.json");
+            return System.IO.File.Exists(path) ? System.IO.File.ReadAllText(path) : null;
         }
 
         private async void Start()

@@ -211,7 +211,7 @@ namespace VRoom
                 ? new Rect(_pos.x * s, _pos.y * s, WinW * s, WinH * s)
                 : Rect.zero;
 
-            if (e.type == EventType.MouseDown && !(windowRect.Contains(e.mousePosition) || SideBarRect(s).Contains(e.mousePosition)))
+            if (e.type == EventType.MouseDown && !OverUi(e.mousePosition, s))
             {
                 _looking = true;
                 GUI.FocusControl(null);   // clicking the scene leaves the text fields, so W A S D move again
@@ -238,7 +238,7 @@ namespace VRoom
 
                 e.Use();
             }
-            else if (e.type == EventType.ScrollWheel && _camMode == CamMode.God && !(windowRect.Contains(e.mousePosition) || SideBarRect(s).Contains(e.mousePosition)))
+            else if (e.type == EventType.ScrollWheel && _camMode == CamMode.God && !OverUi(e.mousePosition, s))
             {
                 _godDistance = Mathf.Clamp(_godDistance * (1f + e.delta.y * 0.06f), 2f, 200f);
                 ApplyGod();

@@ -217,7 +217,9 @@ namespace VRoom
                 viewCamera.transform.SetPositionAndRotation(new Vector3(4.5f, 11f, -4f), Quaternion.Euler(55f, 0f, 0f));
             }
 
-            new GameObject("ApartmentWallBuilder").AddComponent<ApartmentWallBuilder>();
+            var builder = new GameObject("ApartmentWallBuilder").AddComponent<ApartmentWallBuilder>();
+            builder.UseShell = true;   // the editor screen below replaces the old window
+            builder.gameObject.AddComponent<EditorShell>().Init(builder, font);
         }
 
         // ---------------------------------------------------------------- the room

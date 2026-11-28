@@ -71,7 +71,7 @@ namespace VRoom
             var centre = (min + max) * 0.5f;
             var extent = Vector2.Max(max - min, new Vector2(6f, 6f)) + new Vector2(2f, 2f);
             float s = Screen.height / 900f;
-            float freeRight = Mathf.Clamp(1f - (WinW + 60f + ToolW) * s / Screen.width, 0.35f, 0.95f);
+            float freeRight = Mathf.Clamp(1f - ReservedRightPx(s) / Screen.width, 0.35f, 0.95f);
             float size = Mathf.Max(extent.x / (freeRight * 2f * cam.aspect), extent.y * 0.5f);
             float visibleWidth = 2f * size * cam.aspect;
             cam.orthographic = true;
@@ -175,7 +175,7 @@ namespace VRoom
             var windowRect = _visible
                 ? new Rect(_pos.x * s, _pos.y * s, WinW * s, WinH * s)
                 : Rect.zero;
-            bool overWindow = windowRect.Contains(e.mousePosition) || SideBarRect(s).Contains(e.mousePosition);
+            bool overWindow = OverUi(e.mousePosition, s);
             float hs = HandleSize * s;                                  // everything is sized for the screen height, so it stays readable
             _planLabel.fontSize = Mathf.RoundToInt(17f * s);
 

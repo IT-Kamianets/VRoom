@@ -196,6 +196,7 @@ namespace VRoom
             if (_plan2D) PlanGUI();   // grid, sizes and corner handles of the 2D plan, drawn in screen pixels
             ModesGUI();               // mouse and keys of god mode and walking
             HistoryKeys();            // Ctrl+Z and Ctrl+Y
+            if (UseShell) return;     // the editor screen (EditorShell) replaces this window and the side bar
             float s = Screen.height / 900f;
             GUI.matrix = Matrix4x4.Scale(new Vector3(s, s, 1f));
             if (_pos.x < 0f) _pos.x = Screen.width / s - WinW - ToolW - 40f;
@@ -365,6 +366,7 @@ namespace VRoom
 
         void Rebuild()
         {
+            Version++;
             if (!Dragging) Save();   // while a corner is being dragged, save once when the mouse is released
             BuildInner();
             if (_wall != null) Destroy(_wall);
@@ -456,7 +458,7 @@ namespace VRoom
             var c = new Vector3((min.x + max.x) * 0.5f, maxH * 0.5f, (min.y + max.y) * 0.5f);
 
             float s = Screen.height / 900f;
-            float freeRight = 1f - (WinW + 60f + ToolW) * s / Screen.width;   // the window takes the right part of the screen
+            float freeRight = 1f - ReservedRightPx(s) / Screen.width;   // the window takes the right part of the screen
             freeRight = Mathf.Clamp(freeRight, 0.35f, 0.95f);
             const float margin = 0.04f;
             float targetX = freeRight * 0.5f;

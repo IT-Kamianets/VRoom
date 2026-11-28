@@ -30,27 +30,31 @@ namespace VRoom
 
         // ---------------------------------------------------------------- the layout from the apartment plan
 
-        // Walls between the rooms of the 3A apartment (centre lines, metres, same coordinates as the exterior contour).
-        // The gaps in them are the doorways.
+        // Walls between the rooms of the 3A apartment: x1, z1, x2, z2, thickness (centre lines, metres, the coordinates
+        // of the exterior contour). Measured from the plan picture pixel by pixel: the thick dark walls are 0.2-0.35 m,
+        // the thin partitions 0.1 m, and the gaps in them are the doorways.
         static readonly float[][] PlanLayout =
         {
-            new[] { 0.77f, 4.45f, 4.85f, 4.45f },   // bedroom 1 / living room
-            new[] { 5.75f, 4.45f, 6.16f, 4.45f },   //   (doorway 4.85 - 5.75 to the hall)
-            new[] { 6.16f, 4.45f, 6.16f, 8.10f },   // between the two bedrooms
-            new[] { 6.16f, 4.45f, 7.90f, 4.45f },   // bedroom 2 / hall
-            new[] { 8.80f, 4.45f, 9.75f, 4.45f },   //   (doorway 7.90 - 8.80)
-            new[] { 9.75f, 0.00f, 9.75f, 3.20f },   // hall / kitchen
-            new[] { 9.75f, 4.10f, 9.75f, 8.10f },   //   (doorway 3.20 - 4.10), then bedroom 2 / kitchen and balcony
-            new[] { 9.75f, 6.70f, 11.00f, 6.70f },  // kitchen / balcony
-            new[] { 11.90f, 6.70f, 12.75f, 6.70f }, //   (balcony door 11.00 - 11.90)
-            new[] { 0.77f, 4.79f, 0.77f, 6.00f },   // bedroom 1 / left balcony
-            new[] { 0.77f, 6.90f, 0.77f, 8.10f },   //   (balcony door 6.00 - 6.90)
-            new[] { 9.75f, 1.95f, 10.90f, 1.95f },  // kitchen / small bathroom
-            new[] { 11.80f, 1.95f, 12.75f, 1.95f }, //   (door 10.90 - 11.80)
-            new[] { 5.17f, 0.00f, 5.17f, 2.90f },   // bathroom west wall (the living room is open to the hall)
-            new[] { 5.17f, 2.90f, 7.07f, 2.90f },   // bathroom north wall
-            new[] { 7.07f, 0.00f, 7.07f, 1.00f },   // bathroom east wall
-            new[] { 7.07f, 1.90f, 7.07f, 2.90f },   //   (bathroom door 1.00 - 1.90)
+            // bedrooms
+            new[] { 6.25f, 4.20f, 6.25f, 8.10f, 0.10f },    // partition between the two bedrooms
+            new[] { 9.95f, 3.95f, 9.95f, 8.10f, 0.10f },    // east wall of bedroom 2 (towards the kitchen)
+            new[] { 1.15f, 4.20f, 5.20f, 4.20f, 0.10f },    // south wall of bedroom 1
+            new[] { 6.15f, 4.20f, 8.35f, 4.20f, 0.10f },    // south wall of bedroom 2 (door 5.20 - 6.15 and 8.35 - 9.30)
+            new[] { 9.30f, 4.20f, 9.95f, 4.20f, 0.10f },
+            new[] { 0.95f, 6.70f, 0.95f, 8.10f, 0.30f },    // bedroom 1 / left balcony (thick part; glazing below)
+            new[] { 10.15f, 6.70f, 10.15f, 8.10f, 0.30f },  // bedroom 2 / right balcony
+            // kitchen and balcony
+            new[] { 11.75f, 6.95f, 12.75f, 6.95f, 0.30f },  // kitchen / balcony (door 10.15 - 11.75)
+            // bathroom
+            new[] { 5.25f, 0.00f, 5.25f, 2.75f, 0.10f },    // west wall
+            new[] { 5.25f, 2.75f, 5.55f, 2.75f, 0.10f },    // north wall, door 5.55 - 6.40
+            new[] { 6.40f, 2.75f, 7.15f, 2.75f, 0.10f },
+            new[] { 7.15f, 0.00f, 7.15f, 2.75f, 0.20f },    // east wall
+            new[] { 7.15f, 2.75f, 8.30f, 2.75f, 0.10f },    // the hall's north partition
+            // kitchen / small bathroom (WC)
+            new[] { 9.95f, 1.80f, 12.75f, 1.80f, 0.20f },   // wall between the kitchen and the WC
+            new[] { 9.95f, 1.60f, 9.95f, 2.00f, 0.20f },    // hall / WC, door 0.60 - 1.60
+            new[] { 9.95f, 0.00f, 9.95f, 0.60f, 0.20f },
         };
 
         void LoadPlanLayout()
@@ -59,7 +63,7 @@ namespace VRoom
             _inner = new List<Inner>();
             foreach (var w in PlanLayout)
             {
-                _inner.Add(new Inner { x1 = w[0], z1 = w[1], x2 = w[2], z2 = w[3], height = InnerHeight, thickness = InnerThickness });
+                _inner.Add(new Inner { x1 = w[0], z1 = w[1], x2 = w[2], z2 = w[3], height = InnerHeight, thickness = w[4] });
             }
 
             _selInner = -1;
